@@ -1,5 +1,5 @@
 // ============================================
-// ADPANEL - Mock Veri
+// ADVARA - Mock Veri
 // Yarın n8n bağlandığında bu dosya API çağrılarıyla değiştirilecek
 // ============================================
 

@@ -1,5 +1,5 @@
 // ============================================
-// ADPANEL - Tip Tanımlamaları
+// ADVARA - Tip Tanımlamaları
 // ============================================
 
 // --- Kullanıcı ---
@@ -156,7 +156,7 @@ export interface N8nAdPayload {
   userId: string;
   formData: AdFormData;
   timestamp: string;
-  source: 'adpanel_web';
+  source: 'advara_web';
   // n8n bu payload'ı alıp OpenAI'a gönderecek
 }
 

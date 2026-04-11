@@ -1,5 +1,5 @@
 // ============================================
-// ADPANEL - API Katmanı
+// ADVARA - API Katmanı
 // N8N yerine OpenAI API kullanılıyor
 // ============================================
 
