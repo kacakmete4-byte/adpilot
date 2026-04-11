@@ -66,11 +66,30 @@ export interface AdFormData {
 
 // --- AI Reklam Önerisi ---
 export interface AdSuggestion {
-  message: string;
-  recommendation: string;
-  budget_split: Record<string, number>;
+  message?: string;
+  recommendation?: string;
+  budget_split?: Record<string, number>;
   target_audience?: string;
   ad_examples?: string[];
+  notes?: string[];
+  headlines?: string[];
+  primaryText?: string;
+  callToAction?: string;
+  description?: string;
+  budgetDistribution?: BudgetDistribution[];
+  estimatedReach?: {
+    min: number;
+    max: number;
+  };
+  estimatedClicks?: {
+    min: number;
+    max: number;
+  };
+  estimatedConversions?: {
+    min: number;
+    max: number;
+  };
+  roas?: number;
 }
 
 // --- Bütçe Dağılımı ---

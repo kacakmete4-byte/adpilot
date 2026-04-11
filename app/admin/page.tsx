@@ -88,7 +88,7 @@ export default function AdminPage() {
             </div>
           </Card>
 
-          <Card className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <Card className="animate-fade-in-up">
             <CardHeader
               title="Toplam Gelir"
               subtitle="Reklam bütçelerinden"
@@ -100,7 +100,7 @@ export default function AdminPage() {
             </div>
           </Card>
 
-          <Card className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <Card className="animate-fade-in-up">
             <CardHeader
               title="Komisyon Geliri"
               subtitle="%10 komisyon"
@@ -112,7 +112,7 @@ export default function AdminPage() {
             </div>
           </Card>
 
-          <Card className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <Card className="animate-fade-in-up">
             <CardHeader
               title="Stripe Maliyeti"
               subtitle="Güvenilir payment gateway"
@@ -176,7 +176,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge variant={user.plan === 'pro' ? 'default' : 'secondary'}>
+                    <Badge variant={user.plan === 'pro' ? 'blue' : 'slate'}>
                       {user.plan === 'pro' ? 'Pro' : 'Starter'}
                     </Badge>
                     <p className="text-sm text-slate-500 mt-1">{user.joinedAt}</p>

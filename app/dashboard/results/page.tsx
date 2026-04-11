@@ -178,8 +178,8 @@ export default function ResultsPage() {
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-xs text-slate-500">Örnek {index + 1}</p>
                         <Button
-                          size="xs"
-                          variant="outline"
+                          size="sm"
+                          variant="secondary"
                           onClick={() => copyToClipboard(example, index)}
                         >
                           {copiedIndex === index ? 'Kopyalandı!' : 'Kopyala'}

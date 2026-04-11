@@ -214,7 +214,7 @@ export default function DashboardPage() {
                       ₺{campaign.formData.dailyBudget.toLocaleString('tr-TR')}<span className="text-xs text-slate-500 font-normal">/gün</span>
                     </p>
                     <p className="text-xs text-emerald-600 font-medium mt-0.5">
-                      ROAS: {campaign.suggestion.roas.toFixed(1)}x
+                      {campaign.formData.selectedPlatforms.length} platform
                     </p>
                   </div>
                 </div>

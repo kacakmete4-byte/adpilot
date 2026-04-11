@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { Zap, ArrowRight, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { registerUser } from '@/lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -26,9 +25,16 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      const result = await registerUser(form.name, form.email, form.password, form.company);
-      if (result.success) {
-        router.push('/dashboard');
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        router.push('/login?message=Kayıt başarılı, giriş yapabilirsiniz');
       } else {
         setError(result.error || 'Kayıt başarısız');
       }

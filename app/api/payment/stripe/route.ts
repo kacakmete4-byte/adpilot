@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,15 +44,27 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Veritabanına payment kaydı oluştur
+    const amountValue = plan.price / 100; // Stripe kuruş cinsinden, biz ₺ olarak saklıyoruz
+    const vatValue = Number((amountValue * 0.18).toFixed(2));
+    const amountWithVatValue = Number((amountValue + vatValue).toFixed(2));
+    const commissionValue = Number((amountValue * 0.1).toFixed(2));
+
     await prisma.payment.create({
       data: {
         userId: userId,
-        amount: plan.price / 100, // Stripe kuruş cinsinden, biz ₺ olarak saklıyoruz
-        currency: 'TRY',
+        amount: amountValue,
+        amountWithVat: amountWithVatValue,
+        vat: vatValue,
+        commission: commissionValue,
+        paymentMethod: 'stripe',
         status: 'pending',
+        paymentId:
+          typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : session.payment_intent?.id ?? null,
         stripeSessionId: session.id,
         planType: planType,
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });
 

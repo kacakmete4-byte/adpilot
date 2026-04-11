@@ -33,7 +33,7 @@ export const PLATFORM_CONFIG: Record<Platform, { name: string; color: string; bg
 
 // --- Mock AI Reklam Önerisi ---
 export function generateMockSuggestion(formData: AdFormData): AdSuggestion {
-  const { dailyBudget, selectedPlatforms, adGoal, businessName, sector } = formData;
+  const { dailyBudget, selectedPlatforms, adGoal, businessName, sector, targetLocation } = formData;
 
   const headlines = [
     `${businessName} ile Farkı Hissedin`,
@@ -98,24 +98,19 @@ export function generateMockSuggestion(formData: AdFormData): AdSuggestion {
   const estimatedClicksBase = dailyBudget * 8;
 
   return {
-    headlines,
-    primaryText,
-    callToAction: ctaMap[adGoal] || 'Daha Fazla Bilgi Al',
-    description: `${businessName} ile ${adGoal === 'sales' ? 'satışlarınızı' : 'müşteri kitlenizi'} büyütün. Profesyonel reklam yönetimiyle sonuçlara ulaşın.`,
-    budgetDistribution,
-    estimatedReach: {
-      min: Math.round(estimatedReachBase * 0.8),
-      max: Math.round(estimatedReachBase * 1.3),
+    message: `${businessName} için etkili bir reklam kampanyası önerisi hazır.`,
+    recommendation: `${businessName} için ${adGoal === 'sales' ? 'satış odaklı' : 'dönüşüm odaklı'} reklam stratejisi öneriyorum. Meta ve Google platformlarında günlük ${dailyBudget}₺ ile güçlü bir performans elde edebilirsiniz.`,
+    budget_split: {
+      meta: Math.round(dailyBudget * 0.6),
+      google: Math.round(dailyBudget * 0.4),
+      tiktok: Math.round(dailyBudget * 0.0),
     },
-    estimatedClicks: {
-      min: Math.round(estimatedClicksBase * 0.7),
-      max: Math.round(estimatedClicksBase * 1.4),
-    },
-    estimatedConversions: {
-      min: Math.round(estimatedClicksBase * 0.02),
-      max: Math.round(estimatedClicksBase * 0.05),
-    },
-    roas: 3.2 + Math.random() * 1.5,
+    target_audience: `${targetLocation} bölgesinde ${sector} sektöründe olan, ${adGoal === 'sales' ? 'satışa yönelik' : 'marka farkındalığına yönelik'} kullanıcılar.`,
+    ad_examples: [
+      `${businessName} ile şimdi alışveriş zamanı! Hemen web sitemizi ziyaret edin.`,
+      `Sınırlı süreli kampanya: ${sector} ürünlerinde %10 indirim. Hemen tıklayın.`,
+      `${targetLocation} için özel reklam: Kaliteli hizmet ve hızlı teslimat.`
+    ],
     notes: [
       'Meta ve Instagram kombinasyonu bu sektörde en yüksek dönüşümü sağlar',
       'Görsel içerikler metin içerikten %30 daha iyi performans gösterir',

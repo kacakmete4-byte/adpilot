@@ -53,8 +53,9 @@ model SubscriptionPlan {
 // Kullanıcı Abonelikleri
 model Subscription {
   id              String   @id @default(cuid())
-  userId          String
-  planId          String
+  userId          String   @unique
+  planId          String?
+  planType        String?
   status          String   // "active" | "canceled" | "expired"
   campaignsUsed   Int      @default(0) // Kaç reklam kullanıldı
   startDate       DateTime @default(now())
@@ -66,7 +67,7 @@ model Subscription {
 
   // Relations
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+  plan            SubscriptionPlan? @relation(fields: [planId], references: [id])
 }
 
 // Ödeme Kayıtları
@@ -78,9 +79,12 @@ model Payment {
   amountWithVat   Float    // KDV dahil fiyat (amount * 1.18)
   vat             Float    // KDV tutarı (amount * 0.18)
   commission      Float    // Adpilot'ın komisyonu (%5)
-  paymentMethod   String   // "iyzico" | "test"
+  paymentMethod   String   // "iyzico" | "stripe" | "test"
   status          String   // "pending" | "completed" | "failed"
-  paymentId       String?  // İyzico transaction id
+  paymentId       String?  // İyzico transaction id veya Stripe charge id
+  stripeSessionId String?  // Stripe checkout session id
+  planType        String?  // starter | pro
+  completedAt     DateTime?
   invoiceNo       String?  // Fatura numarası
   issuedDate      DateTime @default(now())
   dueDate         DateTime

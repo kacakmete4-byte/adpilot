@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Zap, Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { loginUser } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,11 +21,16 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const result = await loginUser(email, password);
-      if (result.success) {
-        router.push('/dashboard');
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError('Geçersiz email veya şifre');
       } else {
-        setError(result.error || 'Giriş başarısız');
+        router.push('/dashboard');
       }
     } catch {
       setError('Bir hata oluştu, lütfen tekrar deneyin.');
