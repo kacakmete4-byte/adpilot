@@ -121,8 +121,8 @@ export default function RegisterPage() {
           <div className="mt-6 grid grid-cols-3 gap-2">
             {[
               { name: 'Ücretsiz', price: '₺0', campaigns: '1 kampanya' },
-              { name: 'Starter', price: '₺299', campaigns: '5 kampanya', highlight: true },
-              { name: 'Pro', price: '₺799', campaigns: 'Sınırsız' },
+              { name: 'Starter', price: '₺499', campaigns: '5 kampanya', highlight: true },
+              { name: 'Pro', price: '₺1799', campaigns: 'Sınırsız' },
             ].map((plan) => (
               <div
                 key={plan.name}

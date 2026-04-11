@@ -16,8 +16,8 @@ export async function POST(request: NextRequest) {
 
     // Plan fiyatları
     const plans = {
-      starter: { price: 5000, name: 'Starter Plan' }, // 50₺ = 5000 kuruş
-      pro: { price: 10000, name: 'Pro Plan' }, // 100₺ = 10000 kuruş
+      starter: { price: 49900, name: 'Starter Plan' },
+      pro: { price: 179900, name: 'Pro Plan' },
     };
 
     const plan = plans[planType as keyof typeof plans];

@@ -225,7 +225,7 @@ export default function SettingsPage() {
                         <p className="font-bold text-blue-900">Starter Plan</p>
                         <Badge variant="blue">Aktif</Badge>
                       </div>
-                      <p className="text-sm text-blue-700">Aylık ₺299 · 5 kampanya · 3 kullanıldı</p>
+                      <p className="text-sm text-blue-700">Aylık ₺499 · 5 kampanya · 3 kullanıldı</p>
                     </div>
                     <Button
                       variant="secondary"
@@ -362,8 +362,8 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       { name: 'Ücretsiz', price: '₺0', period: '/ay', campaigns: '1 kampanya', active: false },
-                      { name: 'Starter', price: '₺299', period: '/ay', campaigns: '5 kampanya', active: true },
-                      { name: 'Pro', price: '₺799', period: '/ay', campaigns: 'Sınırsız', active: false },
+                      { name: 'Starter', price: '₺499', period: '/ay', campaigns: '5 kampanya', active: true },
+                      { name: 'Pro', price: '₺1799', period: '/ay', campaigns: 'Sınırsız', active: false },
                     ].map((plan) => (
                       <div
                         key={plan.name}

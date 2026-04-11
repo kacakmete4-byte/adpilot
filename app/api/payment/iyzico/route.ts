@@ -8,8 +8,8 @@ const Iyzipay = require('iyzipay');
 type PlanKey = 'starter' | 'pro';
 
 const PLAN_MAP: Record<PlanKey, { price: number; name: string }> = {
-  starter: { price: 50, name: 'Starter Plan' },
-  pro: { price: 100, name: 'Pro Plan' },
+  starter: { price: 499, name: 'Starter Plan' },
+  pro: { price: 1799, name: 'Pro Plan' },
 };
 
 function createIyzipayClient() {
