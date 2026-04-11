@@ -25,6 +25,8 @@ const TABS = [
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [saved, setSaved] = useState(false);
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState('');
 
   const [profile, setProfile] = useState({
     name: MOCK_USER.name,
@@ -45,6 +47,49 @@ export default function SettingsPage() {
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const startIyzicoPayment = async (planType: 'starter' | 'pro') => {
+    try {
+      setPaymentError('');
+      setProcessingPlan(planType);
+
+      const response = await fetch('/api/payment/iyzico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planType,
+          userId: MOCK_USER.id,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Ödeme başlatılamadı');
+      }
+
+      if (data.paymentPageUrl) {
+        window.location.href = data.paymentPageUrl;
+        return;
+      }
+
+      if (data.checkoutFormContent) {
+        const newWindow = window.open('', '_self');
+        if (newWindow) {
+          newWindow.document.open();
+          newWindow.document.write(data.checkoutFormContent);
+          newWindow.document.close();
+          return;
+        }
+      }
+
+      throw new Error('Iyzico ödeme sayfası açılamadı');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Ödeme başlatılamadı';
+      setPaymentError(message);
+    } finally {
+      setProcessingPlan(null);
+    }
   };
 
   const INTEGRATIONS = [
@@ -177,7 +222,14 @@ export default function SettingsPage() {
                       </div>
                       <p className="text-sm text-blue-700">Aylık ₺299 · 5 kampanya · 3 kullanıldı</p>
                     </div>
-                    <Button variant="secondary" size="sm">Plan Yükselt</Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => startIyzicoPayment('pro')}
+                      disabled={processingPlan !== null}
+                    >
+                      {processingPlan === 'pro' ? 'Yönlendiriliyor...' : 'Plan Yükselt'}
+                    </Button>
                   </div>
                 </Card>
 
@@ -323,12 +375,28 @@ export default function SettingsPage() {
                         <p className="text-xs text-slate-500 mt-1">{plan.campaigns}</p>
                         {plan.active ? (
                           <Badge variant="blue" size="sm">Mevcut Plan</Badge>
+                        ) : plan.name === 'Ücretsiz' ? (
+                          <Button variant="secondary" size="sm" className="mt-2 w-full" disabled>Mevcut Seviye</Button>
                         ) : (
-                          <Button variant="secondary" size="sm" className="mt-2 w-full">Seç</Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="mt-2 w-full"
+                            onClick={() => startIyzicoPayment(plan.name === 'Pro' ? 'pro' : 'starter')}
+                            disabled={processingPlan !== null}
+                          >
+                            {processingPlan === (plan.name === 'Pro' ? 'pro' : 'starter') ? 'Yönlendiriliyor...' : 'Seç'}
+                          </Button>
                         )}
                       </div>
                     ))}
                   </div>
+
+                  {paymentError && (
+                    <div className="p-3 rounded-xl border border-red-200 bg-red-50">
+                      <p className="text-xs text-red-700">{paymentError}</p>
+                    </div>
+                  )}
 
                   {/* Fatura */}
                   <div className="mt-4">
