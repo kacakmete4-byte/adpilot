@@ -3,7 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 
 export const metadata: Metadata = {
-  title: 'AdPanel – AI Reklam Yönetimi',
+  title: 'Advara – AI Reklam Yönetimi',
   description: 'İşletmeniz için yapay zeka destekli reklam yönetim paneli',
 };
 

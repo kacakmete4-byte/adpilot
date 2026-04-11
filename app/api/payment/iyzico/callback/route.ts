@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      const successUrl = `${process.env.NEXTAUTH_URL || 'https://adpanel.vercel.app'}/dashboard?success=true`;
+      const successUrl = `${process.env.NEXTAUTH_URL || 'https://advara.vercel.app'}/dashboard?success=true`;
       return NextResponse.redirect(successUrl);
     }
 
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const failedUrl = `${process.env.NEXTAUTH_URL || 'https://adpanel.vercel.app'}/dashboard/subscription?canceled=true`;
+    const failedUrl = `${process.env.NEXTAUTH_URL || 'https://advara.vercel.app'}/dashboard/subscription?canceled=true`;
     return NextResponse.redirect(failedUrl);
   } catch (error) {
     console.error('Iyzico callback error:', error);

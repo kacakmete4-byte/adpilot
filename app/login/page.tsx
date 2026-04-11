@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/Input';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('demo@adpanel.com');
+  const [email, setEmail] = useState('demo@advara.com');
   const [password, setPassword] = useState('demo123');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function LoginPage() {
           <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" />
           </div>
-          <span className="text-white font-bold text-xl tracking-tight">AdPanel</span>
+          <span className="text-white font-bold text-xl tracking-tight">Advara</span>
         </div>
 
         <div>
@@ -74,7 +74,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-slate-600 text-sm">© 2024 AdPanel. Tüm hakları saklıdır.</p>
+        <p className="text-slate-600 text-sm">© 2024 Advara. Tüm hakları saklıdır.</p>
       </div>
 
       {/* Sağ panel - Form */}
@@ -85,7 +85,7 @@ export default function LoginPage() {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="text-white font-bold text-lg">AdPanel</span>
+            <span className="text-white font-bold text-lg">Advara</span>
           </div>
 
           <div className="bg-white rounded-2xl shadow-2xl p-8">

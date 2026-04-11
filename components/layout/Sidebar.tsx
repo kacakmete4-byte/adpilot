@@ -8,6 +8,7 @@ import {
   PlusCircle,
   BarChart2,
   Settings,
+  MessageSquareWarning,
   Zap,
   LogOut,
   ChevronRight,
@@ -17,6 +18,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/create-ad', label: 'Reklam Oluştur', icon: PlusCircle },
   { href: '/dashboard/reports', label: 'Raporlar', icon: BarChart2 },
+  { href: '/dashboard/support', label: 'Iletisim', icon: MessageSquareWarning },
   { href: '/dashboard/settings', label: 'Ayarlar', icon: Settings },
 ];
 
@@ -35,7 +37,7 @@ export function Sidebar({ user }: SidebarProps) {
           <Zap className="w-4 h-4 text-white" />
         </div>
         <div>
-          <span className="font-bold text-white text-base tracking-tight">AdPanel</span>
+          <span className="font-bold text-white text-base tracking-tight">Advara</span>
           <p className="text-slate-500 text-xs">AI Reklam Yönetimi</p>
         </div>
       </div>
