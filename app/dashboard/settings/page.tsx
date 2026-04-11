@@ -81,12 +81,12 @@ export default function SettingsPage() {
       badge: 'Mock Mod',
     },
     {
-      id: 'stripe',
-      name: 'Stripe',
+      id: 'iyzico',
+      name: 'Iyzico',
       desc: 'Ödeme işlemleri ve fatura yönetimi',
       icon: '💳',
-      status: 'coming',
-      badge: 'Yakında',
+      status: 'connected',
+      badge: 'Aktif',
     },
   ];
 
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                   <div className="mt-4">
                     <p className="text-sm font-semibold text-slate-800 mb-3">Son Faturalar</p>
                     <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
-                      <p className="text-xs text-amber-700">Ödeme sistemi henüz entegre edilmedi. Yakında Stripe entegrasyonu gelecek.</p>
+                      <p className="text-xs text-amber-700">Iyzico ödeme altyapısı aktif. Plan değişikliklerinden sonra ödeme ekranı Iyzico Checkout ile açılır.</p>
                     </div>
                   </div>
                 </div>
