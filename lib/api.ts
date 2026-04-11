@@ -10,10 +10,15 @@ import OpenAI from 'openai';
 const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
 const N8N_BASE_URL = process.env.N8N_WEBHOOK_URL || '';
 
-// OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  if (!process.env.OPENAI_API_KEY) {
+    return null;
+  }
+
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 // =============================================
 // OpenAI ile reklam önerisi al
@@ -22,6 +27,11 @@ export async function getAdSuggestion(formData: AdFormData): Promise<AdSuggestio
   if (IS_MOCK) {
     // Mock mod: 1 saniyelik gecikme ile sahte öneri döndür
     await new Promise((r) => setTimeout(r, 1200));
+    return generateMockSuggestion(formData);
+  }
+
+  const openai = getOpenAIClient();
+  if (!openai) {
     return generateMockSuggestion(formData);
   }
 
