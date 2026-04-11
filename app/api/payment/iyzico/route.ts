@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 
 const Iyzipay = require('iyzipay');
 
@@ -45,19 +47,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'NEXTAUTH_URL yapılandırması eksik' }, { status: 500 });
     }
 
-    const { planType, userId } = await request.json();
-    const selectedPlan = PLAN_MAP[planType as PlanKey];
-
-    if (!selectedPlan || !userId) {
-      return NextResponse.json({ error: 'Geçersiz plan veya kullanıcı' }, { status: 400 });
+    const session = await getServerSession(authOptions);
+    const sessionUserId = (session?.user as any)?.id as string | undefined;
+    if (!sessionUserId) {
+      return NextResponse.json({ error: 'Oturum doğrulanamadı' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const { planType } = await request.json();
+    const selectedPlan = PLAN_MAP[planType as PlanKey];
+
+    if (!selectedPlan) {
+      return NextResponse.json({ error: 'Geçersiz plan' }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: sessionUserId } });
     if (!user) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    const conversationId = `adp-${Date.now()}-${userId}`;
+    const conversationId = `adp-${Date.now()}-${sessionUserId}`;
     const callbackUrl = `${process.env.NEXTAUTH_URL}/api/payment/iyzico/callback`;
 
     const checkoutPayload = {
@@ -66,7 +74,7 @@ export async function POST(request: NextRequest) {
       price: selectedPlan.price.toFixed(2),
       paidPrice: selectedPlan.price.toFixed(2),
       currency: 'TRY',
-      basketId: `basket-${userId}-${Date.now()}`,
+      basketId: `basket-${sessionUserId}-${Date.now()}`,
       paymentGroup: 'SUBSCRIPTION',
       callbackUrl,
       enabledInstallments: [1],
@@ -123,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.payment.create({
       data: {
-        userId,
+        userId: sessionUserId,
         amount: selectedPlan.price,
         amountWithVat: amountWithVatValue,
         vat: vatValue,

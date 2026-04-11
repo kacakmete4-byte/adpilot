@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { MOCK_USER } from '@/lib/mockData';
 import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
 
 const TABS = [
   { id: 'profile', label: 'Profil', icon: User },
@@ -23,6 +24,7 @@ const TABS = [
 ];
 
 export default function SettingsPage() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('profile');
   const [saved, setSaved] = useState(false);
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
@@ -54,12 +56,15 @@ export default function SettingsPage() {
       setPaymentError('');
       setProcessingPlan(planType);
 
+      if (!(session?.user as any)?.id) {
+        throw new Error('Ödeme için önce giriş yapmalısınız');
+      }
+
       const response = await fetch('/api/payment/iyzico', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planType,
-          userId: MOCK_USER.id,
         }),
       });
 
