@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   User, Bell, CreditCard, Shield, Link2, Check,
   Building2, Mail, Phone, Globe, Lock, ChevronRight,
@@ -11,7 +11,6 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { MOCK_USER } from '@/lib/mockData';
 import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
 
@@ -27,15 +26,16 @@ export default function SettingsPage() {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('profile');
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState('');
 
   const [profile, setProfile] = useState({
-    name: MOCK_USER.name,
-    email: MOCK_USER.email,
-    company: MOCK_USER.company || '',
-    phone: '+90 555 123 4567',
-    website: 'https://yilmaztekstil.com',
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    website: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -46,9 +46,50 @@ export default function SettingsPage() {
     marketingEmails: false,
   });
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const response = await fetch('/api/user/profile');
+        const data = await response.json();
+        if (!response.ok) {
+          return;
+        }
+
+        setProfile((prev) => ({
+          ...prev,
+          name: data.user?.name || '',
+          email: data.user?.email || '',
+          company: data.user?.businessName || '',
+          phone: data.user?.phone || '',
+        }));
+      } catch (error) {
+        console.error('Profile load error:', error);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      setSaveError('');
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Profil kaydedilemedi');
+      }
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Profil kaydedilemedi';
+      setSaveError(message);
+    }
   };
 
   const startIyzicoPayment = async (planType: 'starter' | 'pro') => {
@@ -247,6 +288,7 @@ export default function SettingsPage() {
                     {saved ? 'Kaydedildi!' : 'Değişiklikleri Kaydet'}
                   </Button>
                 </div>
+                {saveError && <p className="text-sm text-red-600 text-right">{saveError}</p>}
               </>
             )}
 

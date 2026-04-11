@@ -95,11 +95,22 @@ export default function CreateAdPage() {
       
       // OpenAI ile analiz yap
       const data = await getAdSuggestion(form);
+      const saveResponse = await fetch('/api/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formData: form, suggestion: data }),
+      });
+
+      const saveData = await saveResponse.json();
+      if (!saveResponse.ok) {
+        throw new Error(saveData?.error || 'Kampanya kaydedilemedi');
+      }
       
       console.log('OpenAI analizi tamamlandı:', data);
 
       sessionStorage.setItem('adFormData', JSON.stringify(form));
       sessionStorage.setItem('n8nWebhookResponse', JSON.stringify(data));
+      sessionStorage.setItem('campaignId', String(saveData?.campaignId || ''));
 
       console.log('Veriler sessionStorage\'a kaydedildi, results sayfasına yönlendiriliyor...');
       router.push('/dashboard/results');

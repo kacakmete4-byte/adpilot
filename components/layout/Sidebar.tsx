@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
 import {
   LayoutDashboard,
   PlusCircle,
@@ -22,12 +23,11 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Ayarlar', icon: Settings },
 ];
 
-interface SidebarProps {
-  user?: { name: string; email: string; plan: string };
-}
-
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const userName = session?.user?.name || 'Kullanici';
+  const userEmail = session?.user?.email || '';
 
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-slate-900 flex flex-col z-50">
@@ -81,11 +81,11 @@ export function Sidebar({ user }: SidebarProps) {
       <div className="px-4 pb-5 pt-2 border-t border-slate-800">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-            {user?.name?.charAt(0) || 'A'}
+            {userName.charAt(0).toUpperCase() || 'A'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-xs font-medium truncate">{user?.name || 'Kullanıcı'}</p>
-            <p className="text-slate-500 text-xs truncate">{user?.email || ''}</p>
+            <p className="text-white text-xs font-medium truncate">{userName}</p>
+            <p className="text-slate-500 text-xs truncate">{userEmail}</p>
           </div>
           <Link href="/login" className="text-slate-500 hover:text-slate-300 transition-colors">
             <LogOut className="w-4 h-4" />

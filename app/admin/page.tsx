@@ -6,25 +6,30 @@ import { Badge } from '@/components/ui/Badge';
 import { Header } from '@/components/layout/Header';
 import {
   Users, DollarSign, TrendingUp, CreditCard,
-  Calendar, Target, BarChart3
+  MessageSquareWarning, BarChart3
 } from 'lucide-react';
-import { prisma } from '@/lib/prisma';
 
 interface Stats {
   totalUsers: number;
+  totalCampaigns: number;
+  totalTickets: number;
   totalRevenue: number;
   totalCommission: number;
   recentPayments: any[];
   recentUsers: any[];
+  recentTickets: any[];
 }
 
 export default function AdminPage() {
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
+    totalCampaigns: 0,
+    totalTickets: 0,
     totalRevenue: 0,
     totalCommission: 0,
     recentPayments: [],
-    recentUsers: []
+    recentUsers: [],
+    recentTickets: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -34,21 +39,22 @@ export default function AdminPage() {
 
   const fetchStats = async () => {
     try {
-      // Bu kısım server component'ta çalışmalı ama şimdilik mock data
+      const response = await fetch('/api/admin/overview');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Admin verisi getirilemedi');
+      }
+
       setStats({
-        totalUsers: 47,
-        totalRevenue: 705000, // 47 user × 15,000₺
-        totalCommission: 70500, // %10 komisyon
-        recentPayments: [
-          { id: '1', user: 'Ahmet Yılmaz', amount: 15000, date: '2024-01-15' },
-          { id: '2', user: 'Ayşe Kaya', amount: 15000, date: '2024-01-14' },
-          { id: '3', user: 'Mehmet Demir', amount: 15000, date: '2024-01-13' },
-        ],
-        recentUsers: [
-          { id: '1', name: 'Ahmet Yılmaz', email: 'ahmet@example.com', plan: 'starter', joinedAt: '2024-01-15' },
-          { id: '2', name: 'Ayşe Kaya', email: 'ayse@example.com', plan: 'pro', joinedAt: '2024-01-14' },
-          { id: '3', name: 'Mehmet Demir', email: 'mehmet@example.com', plan: 'starter', joinedAt: '2024-01-13' },
-        ]
+        totalUsers: data?.stats?.totalUsers || 0,
+        totalCampaigns: data?.stats?.totalCampaigns || 0,
+        totalTickets: data?.stats?.totalTickets || 0,
+        totalRevenue: data?.stats?.totalRevenue || 0,
+        totalCommission: data?.stats?.totalCommission || 0,
+        recentPayments: data?.recentPayments || [],
+        recentUsers: data?.recentUsers || [],
+        recentTickets: data?.recentTickets || [],
       });
     } catch (error) {
       console.error('Stats fetch error:', error);
@@ -69,7 +75,7 @@ export default function AdminPage() {
     <div>
       <Header
         title="Admin Paneli"
-        subtitle="ADPILOT platform yönetimi ve gelir takibi"
+        subtitle="Advara platform yönetimi, müşteri ve gelir takibi"
       />
 
       <div className="px-8 py-8 space-y-6">
@@ -84,7 +90,7 @@ export default function AdminPage() {
             />
             <div className="p-4">
               <p className="text-3xl font-bold text-slate-900">{stats.totalUsers.toLocaleString()}</p>
-              <p className="text-sm text-emerald-600 mt-1">+12% bu ay</p>
+              <p className="text-sm text-slate-500 mt-1">Toplam müşteri adedi</p>
             </div>
           </Card>
 
@@ -96,7 +102,7 @@ export default function AdminPage() {
             />
             <div className="p-4">
               <p className="text-3xl font-bold text-slate-900">₺{stats.totalRevenue.toLocaleString()}</p>
-              <p className="text-sm text-emerald-600 mt-1">+15% bu ay</p>
+              <p className="text-sm text-slate-500 mt-1">Tamamlanan ödemeler</p>
             </div>
           </Card>
 
@@ -108,19 +114,19 @@ export default function AdminPage() {
             />
             <div className="p-4">
               <p className="text-3xl font-bold text-slate-900">₺{stats.totalCommission.toLocaleString()}</p>
-              <p className="text-sm text-emerald-600 mt-1">Net kar</p>
+              <p className="text-sm text-slate-500 mt-1">Toplam komisyon</p>
             </div>
           </Card>
 
           <Card className="animate-fade-in-up">
             <CardHeader
-              title="Stripe Maliyeti"
-              subtitle="Güvenilir payment gateway"
+              title="Destek Talebi"
+              subtitle="Müşteri mesajları"
               icon={<CreditCard className="w-5 h-5" />}
             />
             <div className="p-4">
-              <p className="text-3xl font-bold text-slate-900">₺{Math.round(stats.totalUsers * 25).toLocaleString()}</p>
-              <p className="text-sm text-emerald-600 mt-1">~25₺/ödeme (çok düşük)</p>
+              <p className="text-3xl font-bold text-slate-900">{stats.totalTickets.toLocaleString()}</p>
+              <p className="text-sm text-slate-500 mt-1">Açılan toplam talep</p>
             </div>
           </Card>
         </div>
@@ -141,16 +147,20 @@ export default function AdminPage() {
                       <DollarSign className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">{payment.user}</p>
-                      <p className="text-sm text-slate-500">{payment.date}</p>
+                      <p className="font-medium text-slate-900">{payment.user?.name || payment.user?.email || 'Kullanıcı'}</p>
+                      <p className="text-sm text-slate-500">{new Date(payment.createdAt).toLocaleDateString('tr-TR')}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-slate-900">₺{payment.amount.toLocaleString()}</p>
-                    <p className="text-sm text-emerald-600">Komisyon: ₺{Math.round(payment.amount * 0.1).toLocaleString()}</p>
+                    <p className="font-bold text-slate-900">₺{Math.round(payment.amountWithVat || payment.amount || 0).toLocaleString()}</p>
+                    <p className="text-sm text-emerald-600">Komisyon: ₺{Math.round(payment.commission || 0).toLocaleString()}</p>
                   </div>
                 </div>
               ))}
+
+              {stats.recentPayments.length === 0 && (
+                <p className="text-sm text-slate-500">Henüz ödeme kaydı yok.</p>
+              )}
             </div>
           </div>
         </Card>
@@ -176,80 +186,48 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge variant={user.plan === 'pro' ? 'blue' : 'slate'}>
-                      {user.plan === 'pro' ? 'Pro' : 'Starter'}
+                    <Badge variant="slate">
+                      Kullanıcı
                     </Badge>
-                    <p className="text-sm text-slate-500 mt-1">{user.joinedAt}</p>
+                    <p className="text-sm text-slate-500 mt-1">{new Date(user.createdAt).toLocaleDateString('tr-TR')}</p>
                   </div>
                 </div>
               ))}
+
+              {stats.recentUsers.length === 0 && (
+                <p className="text-sm text-slate-500">Henüz kullanıcı kaydı yok.</p>
+              )}
             </div>
           </div>
         </Card>
 
-        {/* Kar Analizi */}
+        {/* Son Mesajlar */}
         <Card className="animate-fade-in-up">
           <CardHeader
-            title="Kar Analizi (50 Müşteri)"
-            subtitle="Aylık gelir ve gider hesaplaması"
-            icon={<TrendingUp className="w-5 h-5" />}
+            title="Son Destek Mesajları"
+            subtitle="Müşterilerden gelen son talepler"
+            icon={<MessageSquareWarning className="w-5 h-5" />}
           />
           <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h4 className="font-semibold text-slate-900">Gelirler</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Reklam Bütçeleri (50×15,000₺)</span>
-                    <span className="font-medium">₺750,000</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Abonelik Geliri (50×50₺)</span>
-                    <span className="font-medium">₺2,500</span>
-                  </div>
-                  <div className="border-t pt-2">
-                    <div className="flex justify-between font-semibold">
-                      <span>Toplam Gelir</span>
-                      <span>₺752,500</span>
+            <div className="space-y-3">
+              {stats.recentTickets.map((ticket) => (
+                <div key={ticket.id} className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-slate-900">{ticket.subject}</p>
+                      <p className="text-xs text-slate-500">{ticket.name} - {ticket.email}</p>
                     </div>
+                    <Badge variant={ticket.status === 'open' ? 'yellow' : 'green'}>
+                      {ticket.status}
+                    </Badge>
                   </div>
+                  <p className="text-xs text-slate-500 mt-1">{new Date(ticket.createdAt).toLocaleDateString('tr-TR')}</p>
                 </div>
-              </div>
+              ))}
 
-              <div className="space-y-4">
-                <h4 className="font-semibold text-slate-900">Giderler</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">OpenAI API (50×50₺)</span>
-                    <span className="font-medium">₺2,500</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Stripe Komisyonu (%3.5)</span>
-                    <span className="font-medium">₺26,250</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Vercel Hosting</span>
-                    <span className="font-medium">₺500</span>
-                  </div>
-                  <div className="border-t pt-2">
-                    <div className="flex justify-between font-semibold">
-                      <span>Toplam Gider</span>
-                      <span>₺29,250</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 rounded-lg bg-emerald-50 border border-emerald-200">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
-                <h4 className="font-semibold text-emerald-900">Net Kar: ₺723,250/ay</h4>
-              </div>
-              <p className="text-sm text-emerald-700">
-                Stripe + OpenAI sistemi ile aylık 723 bin ₺ net kar! İyzico'ya göre daha güvenilir,
-                daha az chargeback riski ve otomatik subscription yönetimi.
-              </p>
+              {stats.recentTickets.length === 0 && (
+                <p className="text-sm text-slate-500">Henüz destek talebi yok.</p>
+              )}
             </div>
           </div>
         </Card>

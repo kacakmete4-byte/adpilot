@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import {
   DollarSign, TrendingUp, MousePointerClick, Megaphone,
   Lightbulb, Star, PlusCircle, ArrowRight, Zap,
@@ -12,8 +13,16 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { Button } from '@/components/ui/Button';
 import { Badge, StatusBadge } from '@/components/ui/Badge';
 import { BudgetDistributionChart } from '@/components/dashboard/BudgetDistribution';
-import { MOCK_DASHBOARD_STATS, MOCK_CAMPAIGNS, MOCK_USER, PLATFORM_CONFIG } from '@/lib/mockData';
+import { MOCK_DASHBOARD_STATS, PLATFORM_CONFIG } from '@/lib/mockData';
 import { Platform } from '@/lib/types';
+
+type DBCampaign = {
+  id: string;
+  title: string;
+  budget: number | null;
+  status: string;
+  aiAnalysis: string | null;
+};
 
 const MOCK_BUDGET_DISTRIBUTION = [
   { platform: 'meta' as Platform, percentage: 50, dailyAmount: 225 },
@@ -34,7 +43,60 @@ const DAILY_CHART = [
 const maxSpend = Math.max(...DAILY_CHART.map((d) => d.spend));
 
 export default function DashboardPage() {
-  const stats = MOCK_DASHBOARD_STATS;
+  const [campaigns, setCampaigns] = useState<DBCampaign[]>([]);
+  const [campaignLoading, setCampaignLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      try {
+        const response = await fetch('/api/campaigns');
+        const data = await response.json();
+        if (response.ok && Array.isArray(data?.campaigns)) {
+          setCampaigns(data.campaigns);
+        }
+      } catch (error) {
+        console.error('Campaign load error:', error);
+      } finally {
+        setCampaignLoading(false);
+      }
+    };
+
+    loadCampaigns();
+  }, []);
+
+  const parsedCampaigns = useMemo(() => {
+    return campaigns.map((campaign) => {
+      let businessName = campaign.title;
+      let selectedPlatforms: Platform[] = ['meta'];
+      let dailyBudget = campaign.budget || 0;
+
+      try {
+        if (campaign.aiAnalysis) {
+          const parsed = JSON.parse(campaign.aiAnalysis);
+          businessName = parsed?.formData?.businessName || businessName;
+          selectedPlatforms = parsed?.formData?.selectedPlatforms || selectedPlatforms;
+          dailyBudget = Number(parsed?.formData?.dailyBudget || dailyBudget || 0);
+        }
+      } catch {
+        // Parse edilemeyen eski kayıtlarda title/budget fallback kullanılır.
+      }
+
+      return {
+        id: campaign.id,
+        status: campaign.status as 'draft' | 'active' | 'paused' | 'completed',
+        businessName,
+        selectedPlatforms,
+        dailyBudget,
+      };
+    });
+  }, [campaigns]);
+
+  const stats = {
+    ...MOCK_DASHBOARD_STATS,
+    todayBudget: parsedCampaigns.reduce((sum, c) => sum + c.dailyBudget, 0) || MOCK_DASHBOARD_STATS.todayBudget,
+    activeCampaigns: parsedCampaigns.length,
+  };
+
   const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
@@ -188,7 +250,7 @@ export default function DashboardPage() {
               }
             />
             <div className="space-y-3">
-              {MOCK_CAMPAIGNS.map((campaign) => (
+              {parsedCampaigns.map((campaign) => (
                 <div
                   key={campaign.id}
                   className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer group"
@@ -198,11 +260,11 @@ export default function DashboardPage() {
                       <Megaphone className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{campaign.formData.businessName}</p>
+                      <p className="text-sm font-semibold text-slate-900">{campaign.businessName}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <StatusBadge status={campaign.status} />
                         <span className="text-xs text-slate-500">
-                          {campaign.formData.selectedPlatforms.map((p) =>
+                          {campaign.selectedPlatforms.map((p) =>
                             PLATFORM_CONFIG[p]?.name.split(' ')[0]
                           ).join(', ')}
                         </span>
@@ -211,14 +273,20 @@ export default function DashboardPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-slate-900">
-                      ₺{campaign.formData.dailyBudget.toLocaleString('tr-TR')}<span className="text-xs text-slate-500 font-normal">/gün</span>
+                      ₺{campaign.dailyBudget.toLocaleString('tr-TR')}<span className="text-xs text-slate-500 font-normal">/gün</span>
                     </p>
                     <p className="text-xs text-emerald-600 font-medium mt-0.5">
-                      {campaign.formData.selectedPlatforms.length} platform
+                      {campaign.selectedPlatforms.length} platform
                     </p>
                   </div>
                 </div>
               ))}
+
+              {!campaignLoading && parsedCampaigns.length === 0 && (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 text-sm text-amber-800">
+                  Henüz kampanya yok. "Yeni Kampanya Oluştur" ile ilk reklamını başlatabilirsin.
+                </div>
+              )}
 
               <Link href="/dashboard/create-ad">
                 <button className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 hover:border-blue-300 hover:text-blue-600 transition-all text-sm font-medium">
