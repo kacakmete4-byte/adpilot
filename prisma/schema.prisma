@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ADPILOT - Core Models
+// ============================================
+
+// Kullanıcı Modeli
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  businessName  String?
+  phone         String?
+  image         String?
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+  campaigns     Campaign[]
+  payments      Payment[]
+  competitors   CompetitorAnalysis[]
+  withdrawals   Withdrawal[]
+}
+
+// Abonelik Planları
+model SubscriptionPlan {
+  id        String   @id @default(cuid())
+  name      String   // "Starter" | "Pro"
+  price     Float    // Aylık fiyat (KDV hariç)
+  campaigns Int      // Kaç reklam hakkı
+  features  String   // JSON array
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+}
+
+// Kullanıcı Abonelikleri
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String
+  planId          String
+  status          String   // "active" | "canceled" | "expired"
+  campaignsUsed   Int      @default(0) // Kaç reklam kullanıldı
+  startDate       DateTime @default(now())
+  endDate         DateTime
+  nextBillingDate DateTime
+  autoRenew       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+// Ödeme Kayıtları
+model Payment {
+  id              String   @id @default(cuid())
+  userId          String
+  subscriptionId  String?
+  amount          Float    // KDV hariç fiyat
+  amountWithVat   Float    // KDV dahil fiyat (amount * 1.18)
+  vat             Float    // KDV tutarı (amount * 0.18)
+  commission      Float    // Adpilot'ın komisyonu (%5)
+  paymentMethod   String   // "iyzico" | "test"
+  status          String   // "pending" | "completed" | "failed"
+  paymentId       String?  // İyzico transaction id
+  invoiceNo       String?  // Fatura numarası
+  issuedDate      DateTime @default(now())
+  dueDate         DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Kampanyalar (Reklamlar)
+model Campaign {
+  id              String   @id @default(cuid())
+  userId          String
+  title           String   // "Yaz Koleksiyonu"
+  content         String   // Reklam metni
+  image           String?  // Reklam görseli URL
+  budget          Float?   // Reklam bütçesi
+  sector          String?  // Sektör
+  goal            String?  // Amaç
+  status          String   @default("draft") // "draft" | "active" | "completed"
+  aiAnalysis      String?  // N8N tarafından yapılan analiz (JSON)
+  commission      Float?   // Bu reklama ait komisyon
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  competitors     CompetitorAnalysis[]
+}
+
+// Rakip Analizi
+model CompetitorAnalysis {
+  id              String   @id @default(cuid())
+  userId          String
+  campaignId      String
+  competitorName  String   // "Rakip Şirketi"
+  competitorSector String  // Sektör
+  strengths       String   // JSON array
+  weaknesses      String   // JSON array
+  opportunities   String   // Recommendations
+  advantage       Float?   // Senin avantajın % olarak
+  analysis        String?  // N8N AI analizi
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign        Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+// Para Çekişi (Withdrawal)
+model Withdrawal {
+  id              String   @id @default(cuid())
+  userId          String
+  amount          Float    // Çekilecek tutar
+  status          String   @default("pending") // "pending" | "completed" | "rejected"
+  bankAccount     String?  // IBAN
+  requestedAt     DateTime @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// İstatistikler (Admin için)
+model Statistics {
+  id              String   @id @default(cuid())
+  totalUsers      Int      @default(0)
+  totalRevenue    Float    @default(0) // KDV dahil
+  totalCommission Float    @default(0) // Adpilot'ın toplam komisyonu
+  totalCampaigns  Int      @default(0)
+  activeSubscriptions Int   @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

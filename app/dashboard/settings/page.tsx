@@ -1,0 +1,372 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  User, Bell, CreditCard, Shield, Link2, Check,
+  Building2, Mail, Phone, Globe, Lock, ChevronRight,
+  Zap, AlertCircle
+} from 'lucide-react';
+import { Header } from '@/components/layout/Header';
+import { Card, CardHeader } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Badge } from '@/components/ui/Badge';
+import { MOCK_USER } from '@/lib/mockData';
+import clsx from 'clsx';
+
+const TABS = [
+  { id: 'profile', label: 'Profil', icon: User },
+  { id: 'integrations', label: 'Entegrasyonlar', icon: Link2 },
+  { id: 'notifications', label: 'Bildirimler', icon: Bell },
+  { id: 'billing', label: 'Faturalama', icon: CreditCard },
+  { id: 'security', label: 'Güvenlik', icon: Shield },
+];
+
+export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState('profile');
+  const [saved, setSaved] = useState(false);
+
+  const [profile, setProfile] = useState({
+    name: MOCK_USER.name,
+    email: MOCK_USER.email,
+    company: MOCK_USER.company || '',
+    phone: '+90 555 123 4567',
+    website: 'https://yilmaztekstil.com',
+  });
+
+  const [notifications, setNotifications] = useState({
+    campaignReports: true,
+    budgetAlerts: true,
+    aiSuggestions: true,
+    weeklyDigest: false,
+    marketingEmails: false,
+  });
+
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  const INTEGRATIONS = [
+    {
+      id: 'meta',
+      name: 'Meta Business',
+      desc: 'Facebook ve Instagram reklamlarını yönetin',
+      icon: '🔵',
+      status: 'pending',
+      badge: 'Bağlantı Bekliyor',
+    },
+    {
+      id: 'google',
+      name: 'Google Ads',
+      desc: 'Google arama ve görüntülü reklam ağı',
+      icon: '🔴',
+      status: 'pending',
+      badge: 'Bağlantı Bekliyor',
+    },
+    {
+      id: 'openai',
+      name: 'OpenAI',
+      desc: 'AI reklam önerileri için GPT-4 entegrasyonu',
+      icon: '🤖',
+      status: 'mock',
+      badge: 'Mock Mod',
+    },
+    {
+      id: 'n8n',
+      name: 'n8n Otomasyon',
+      desc: 'İş akışı otomasyonu ve API entegrasyonu',
+      icon: '⚡',
+      status: 'mock',
+      badge: 'Mock Mod',
+    },
+    {
+      id: 'stripe',
+      name: 'Stripe',
+      desc: 'Ödeme işlemleri ve fatura yönetimi',
+      icon: '💳',
+      status: 'coming',
+      badge: 'Yakında',
+    },
+  ];
+
+  return (
+    <div>
+      <Header
+        title="Ayarlar"
+        subtitle="Hesap ve uygulama ayarlarınızı yönetin"
+      />
+
+      <div className="px-8 py-8">
+        <div className="flex gap-6">
+
+          {/* Yan Menü */}
+          <aside className="w-52 flex-shrink-0">
+            <nav className="space-y-1">
+              {TABS.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={clsx(
+                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left',
+                    activeTab === id
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  )}
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  {label}
+                </button>
+              ))}
+            </nav>
+          </aside>
+
+          {/* İçerik */}
+          <div className="flex-1 min-w-0 space-y-5">
+
+            {/* Profil */}
+            {activeTab === 'profile' && (
+              <>
+                <Card>
+                  <CardHeader title="Kişisel Bilgiler" subtitle="Hesap bilgilerinizi güncelleyin" icon={<User className="w-4 h-4" />} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                    <Input
+                      label="Ad Soyad"
+                      value={profile.name}
+                      onChange={(e) => setProfile(p => ({ ...p, name: e.target.value }))}
+                      prefix={<User className="w-4 h-4" />}
+                    />
+                    <Input
+                      label="E-posta"
+                      type="email"
+                      value={profile.email}
+                      onChange={(e) => setProfile(p => ({ ...p, email: e.target.value }))}
+                      prefix={<Mail className="w-4 h-4" />}
+                    />
+                    <Input
+                      label="İşletme Adı"
+                      value={profile.company}
+                      onChange={(e) => setProfile(p => ({ ...p, company: e.target.value }))}
+                      prefix={<Building2 className="w-4 h-4" />}
+                    />
+                    <Input
+                      label="Telefon"
+                      type="tel"
+                      value={profile.phone}
+                      onChange={(e) => setProfile(p => ({ ...p, phone: e.target.value }))}
+                      prefix={<Phone className="w-4 h-4" />}
+                    />
+                    <Input
+                      label="Web Sitesi"
+                      type="url"
+                      value={profile.website}
+                      onChange={(e) => setProfile(p => ({ ...p, website: e.target.value }))}
+                      prefix={<Globe className="w-4 h-4" />}
+                    />
+                  </div>
+                </Card>
+
+                {/* Plan */}
+                <Card>
+                  <CardHeader title="Mevcut Plan" icon={<Zap className="w-4 h-4" />} />
+                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-bold text-blue-900">Starter Plan</p>
+                        <Badge variant="blue">Aktif</Badge>
+                      </div>
+                      <p className="text-sm text-blue-700">Aylık ₺299 · 5 kampanya · 3 kullanıldı</p>
+                    </div>
+                    <Button variant="secondary" size="sm">Plan Yükselt</Button>
+                  </div>
+                </Card>
+
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleSave}
+                    icon={saved ? <Check className="w-4 h-4" /> : undefined}
+                    variant={saved ? 'success' : 'primary'}
+                  >
+                    {saved ? 'Kaydedildi!' : 'Değişiklikleri Kaydet'}
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {/* Entegrasyonlar */}
+            {activeTab === 'integrations' && (
+              <Card>
+                <CardHeader
+                  title="API Entegrasyonları"
+                  subtitle="Reklam platformlarını ve servisleri bağlayın"
+                  icon={<Link2 className="w-4 h-4" />}
+                />
+                <div className="mt-2 p-3.5 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-2.5 mb-5">
+                  <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Demo Mod Aktif</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      Şu an mock veriyle çalışıyorsunuz. Gerçek entegrasyonlar yakında eklenecek. n8n webhook bağlantısı için .env.local dosyasını güncelleyin.
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {INTEGRATIONS.map((integration) => (
+                    <div
+                      key={integration.id}
+                      className="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:border-slate-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-2xl">{integration.icon}</span>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{integration.name}</p>
+                          <p className="text-xs text-slate-500">{integration.desc}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge
+                          variant={
+                            integration.status === 'connected' ? 'green' :
+                            integration.status === 'mock' ? 'blue' :
+                            integration.status === 'coming' ? 'slate' : 'yellow'
+                          }
+                        >
+                          {integration.badge}
+                        </Badge>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={integration.status === 'coming'}
+                        >
+                          {integration.status === 'connected' ? 'Bağlantıyı Kes' :
+                           integration.status === 'coming' ? 'Yakında' : 'Bağlan'}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Bildirimler */}
+            {activeTab === 'notifications' && (
+              <Card>
+                <CardHeader title="Bildirim Ayarları" subtitle="Hangi bildirimleri almak istediğinizi seçin" icon={<Bell className="w-4 h-4" />} />
+                <div className="space-y-4 mt-2">
+                  {[
+                    { key: 'campaignReports', label: 'Kampanya Raporları', desc: 'Günlük ve haftalık performans raporları' },
+                    { key: 'budgetAlerts', label: 'Bütçe Uyarıları', desc: 'Bütçeniz %80 dolduğunda bildirim al' },
+                    { key: 'aiSuggestions', label: 'AI Önerileri', desc: 'Yeni optimizasyon önerileri geldiğinde' },
+                    { key: 'weeklyDigest', label: 'Haftalık Özet', desc: 'Pazartesi günü haftalık özet e-postası' },
+                    { key: 'marketingEmails', label: 'Pazarlama E-postaları', desc: 'Ürün güncellemeleri ve haberler' },
+                  ].map(({ key, label, desc }) => (
+                    <div key={key} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">{label}</p>
+                        <p className="text-xs text-slate-500">{desc}</p>
+                      </div>
+                      <button
+                        onClick={() => setNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof notifications] }))}
+                        className={clsx(
+                          'relative w-10 h-5.5 rounded-full transition-colors flex-shrink-0',
+                          notifications[key as keyof typeof notifications] ? 'bg-blue-600' : 'bg-slate-300'
+                        )}
+                        style={{ width: '40px', height: '22px' }}
+                      >
+                        <span
+                          className={clsx(
+                            'absolute top-0.5 w-4.5 h-4.5 bg-white rounded-full shadow transition-transform',
+                          )}
+                          style={{
+                            width: '18px',
+                            height: '18px',
+                            left: notifications[key as keyof typeof notifications] ? '19px' : '2px',
+                            transition: 'left 0.2s',
+                          }}
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 flex justify-end">
+                  <Button onClick={handleSave} variant={saved ? 'success' : 'primary'}>
+                    {saved ? 'Kaydedildi!' : 'Kaydet'}
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Faturalama */}
+            {activeTab === 'billing' && (
+              <Card>
+                <CardHeader title="Faturalama" subtitle="Plan ve ödeme yönetimi" icon={<CreditCard className="w-4 h-4" />} />
+                <div className="space-y-4 mt-2">
+                  {/* Plan */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { name: 'Ücretsiz', price: '₺0', period: '/ay', campaigns: '1 kampanya', active: false },
+                      { name: 'Starter', price: '₺299', period: '/ay', campaigns: '5 kampanya', active: true },
+                      { name: 'Pro', price: '₺799', period: '/ay', campaigns: 'Sınırsız', active: false },
+                    ].map((plan) => (
+                      <div
+                        key={plan.name}
+                        className={clsx(
+                          'p-4 rounded-xl border-2 text-center transition-all',
+                          plan.active ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'
+                        )}
+                      >
+                        <p className={clsx('font-bold', plan.active ? 'text-blue-700' : 'text-slate-800')}>{plan.name}</p>
+                        <p className={clsx('text-2xl font-bold mt-1', plan.active ? 'text-blue-600' : 'text-slate-900')}>
+                          {plan.price}
+                          <span className="text-sm font-normal text-slate-500">{plan.period}</span>
+                        </p>
+                        <p className="text-xs text-slate-500 mt-1">{plan.campaigns}</p>
+                        {plan.active ? (
+                          <Badge variant="blue" size="sm">Mevcut Plan</Badge>
+                        ) : (
+                          <Button variant="secondary" size="sm" className="mt-2 w-full">Seç</Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Fatura */}
+                  <div className="mt-4">
+                    <p className="text-sm font-semibold text-slate-800 mb-3">Son Faturalar</p>
+                    <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
+                      <p className="text-xs text-amber-700">Ödeme sistemi henüz entegre edilmedi. Yakında Stripe entegrasyonu gelecek.</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {/* Güvenlik */}
+            {activeTab === 'security' && (
+              <Card>
+                <CardHeader title="Güvenlik" subtitle="Hesap güvenliği ve şifre ayarları" icon={<Shield className="w-4 h-4" />} />
+                <div className="space-y-5 mt-2">
+                  <Input label="Mevcut Şifre" type="password" placeholder="••••••••" prefix={<Lock className="w-4 h-4" />} />
+                  <Input label="Yeni Şifre" type="password" placeholder="En az 8 karakter" prefix={<Lock className="w-4 h-4" />} />
+                  <Input label="Yeni Şifre (Tekrar)" type="password" placeholder="Şifrenizi doğrulayın" prefix={<Lock className="w-4 h-4" />} />
+                  <Button>Şifreyi Güncelle</Button>
+
+                  <div className="pt-4 border-t border-slate-100">
+                    <p className="text-sm font-semibold text-slate-800 mb-3">İki Faktörlü Doğrulama</p>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                      <div>
+                        <p className="text-sm font-medium text-slate-800">2FA Kimlik Doğrulama</p>
+                        <p className="text-xs text-slate-500">Hesabınızı ekstra güvenlik katmanıyla koruyun</p>
+                      </div>
+                      <Badge variant="slate">Pasif</Badge>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
