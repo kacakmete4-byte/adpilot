@@ -45,6 +45,11 @@ const maxSpend = Math.max(...DAILY_CHART.map((d) => d.spend));
 export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState<DBCampaign[]>([]);
   const [campaignLoading, setCampaignLoading] = useState(true);
+  const [aiInsights, setAiInsights] = useState<string[]>([
+    'Hafta ici reklamlar %20 daha verimli',
+    'Gorsel icerik metin icerikten %30 daha iyi performans',
+    'Butcenizi persembe gunu icin artirin',
+  ]);
 
   useEffect(() => {
     const loadCampaigns = async () => {
@@ -62,6 +67,22 @@ export default function DashboardPage() {
     };
 
     loadCampaigns();
+  }, []);
+
+  useEffect(() => {
+    const loadInsights = async () => {
+      try {
+        const response = await fetch('/api/ai/insights');
+        const data = await response.json();
+        if (response.ok && Array.isArray(data?.insights) && data.insights.length > 0) {
+          setAiInsights(data.insights.slice(0, 3));
+        }
+      } catch (error) {
+        console.error('AI insight load error:', error);
+      }
+    };
+
+    loadInsights();
   }, []);
 
   const parsedCampaigns = useMemo(() => {
@@ -336,16 +357,12 @@ export default function DashboardPage() {
                 icon={<Lightbulb className="w-4 h-4" />}
               />
               <ul className="space-y-3">
-                {[
-                  { text: 'Hafta içi reklamlar %20 daha verimli', type: 'tip' },
-                  { text: 'Görsel içerik metin içerikten %30 daha iyi performans', type: 'insight' },
-                  { text: 'Bütçenizi perşembe günü için artırın', type: 'action' },
-                ].map((note, i) => (
+                {aiInsights.map((text, i) => (
                   <li key={i} className="flex items-start gap-2.5">
                     <span className="text-base mt-0.5">
-                      {note.type === 'tip' ? '💡' : note.type === 'insight' ? '📊' : '⚡'}
+                      {i === 0 ? '💡' : i === 1 ? '📊' : '⚡'}
                     </span>
-                    <p className="text-xs text-slate-600 leading-relaxed">{note.text}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{text}</p>
                   </li>
                 ))}
               </ul>
