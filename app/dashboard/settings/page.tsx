@@ -29,7 +29,7 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState('');
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'stripe' | 'iyzico'>('bank_transfer');
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'stripe' | 'iyzico' | 'paytr'>('bank_transfer');
   const [bankModal, setBankModal] = useState<null | {
     referenceCode: string;
     planName: string;
@@ -176,6 +176,31 @@ export default function SettingsPage() {
     }
   };
 
+  const startPaytrPayment = async (planType: 'starter' | 'pro') => {
+    try {
+      setPaymentError('');
+      setProcessingPlan(planType);
+
+      const response = await fetch('/api/payment/paytr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planType }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || 'PayTR ödeme başlatılamadı');
+
+      if (data.iframeUrl) {
+        window.location.href = data.iframeUrl;
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Ödeme başlatılamadı';
+      setPaymentError(message);
+    } finally {
+      setProcessingPlan(null);
+    }
+  };
+
   const startBankTransferPayment = async (planType: 'starter' | 'pro') => {
     try {
       setPaymentError('');
@@ -207,6 +232,8 @@ export default function SettingsPage() {
   const handlePlanPayment = (planType: 'starter' | 'pro') => {
     if (paymentMethod === 'bank_transfer') {
       startBankTransferPayment(planType);
+    } else if (paymentMethod === 'paytr') {
+      startPaytrPayment(planType);
     } else if (paymentMethod === 'stripe') {
       startStripePayment(planType);
     } else {
@@ -480,15 +507,16 @@ export default function SettingsPage() {
                   {/* Ödeme Yöntemi Seçimi */}
                   <div>
                     <p className="text-sm font-semibold text-slate-800 mb-2">Ödeme Yöntemi</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                       {[
                         { id: 'bank_transfer', label: 'EFT / Havale', desc: 'Garanti, Ziraat, İş Bankası...', icon: '🏦' },
+                        { id: 'paytr', label: 'PayTR', desc: 'Türkiye Kart Ödeme', icon: '🧾' },
                         { id: 'iyzico', label: 'Iyzico', desc: 'Türk Bankası Kartı & 3D Secure', icon: '🇹🇷' },
                         { id: 'stripe', label: 'Stripe', desc: 'Uluslararası Kart', icon: '💳' },
                       ].map((m) => (
                         <button
                           key={m.id}
-                          onClick={() => setPaymentMethod(m.id as 'bank_transfer' | 'stripe' | 'iyzico')}
+                          onClick={() => setPaymentMethod(m.id as 'bank_transfer' | 'stripe' | 'iyzico' | 'paytr')}
                           className={clsx(
                             'flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all',
                             paymentMethod === m.id
