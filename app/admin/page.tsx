@@ -35,7 +35,6 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [pendingTransfers, setPendingTransfers] = useState<any[]>([]);
   const [approvingId, setApprovingId] = useState<string | null>(null);
-  const adminSecret = process.env.NEXT_PUBLIC_ADMIN_SECRET || '';
 
   useEffect(() => {
     fetchStats();
@@ -58,7 +57,6 @@ export default function AdminPage() {
       setApprovingId(paymentId);
       const response = await fetch(`/api/admin/payments/${paymentId}/approve`, {
         method: 'POST',
-        headers: { 'x-admin-secret': process.env.NEXT_PUBLIC_ADMIN_SECRET || '' },
       });
       if (response.ok) {
         setPendingTransfers((prev) => prev.filter((p) => p.id !== paymentId));

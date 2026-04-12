@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 
-// Sadece server-side veya admin API anahtarıyla çağrılacak
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const adminSecret = request.headers.get('x-admin-secret');
-    if (adminSecret !== process.env.ADMIN_SECRET) {
+    const session = await getServerSession(authOptions);
+    const email = session?.user?.email?.toLowerCase();
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+    if (!email || !adminEmail || email !== adminEmail) {
       return NextResponse.json({ error: 'Yetkisiz' }, { status: 403 });
     }
 
