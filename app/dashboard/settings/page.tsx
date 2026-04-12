@@ -29,6 +29,16 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState('');
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'stripe' | 'iyzico'>('bank_transfer');
+  const [bankModal, setBankModal] = useState<null | {
+    referenceCode: string;
+    planName: string;
+    amountWithVat: number;
+    iban: string;
+    bankName: string;
+    accountName: string;
+    description: string;
+  }>(null);
 
   const [profile, setProfile] = useState({
     name: '',
@@ -135,6 +145,72 @@ export default function SettingsPage() {
       setPaymentError(message);
     } finally {
       setProcessingPlan(null);
+    }
+  };
+
+  const startStripePayment = async (planType: 'starter' | 'pro') => {
+    try {
+      setPaymentError('');
+      setProcessingPlan(planType);
+
+      const userId = (session?.user as any)?.id;
+      if (!userId) throw new Error('Ödeme için önce giriş yapmalısınız');
+
+      const response = await fetch('/api/payment/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planType, userId }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || 'Stripe ödeme başlatılamadı');
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Ödeme başlatılamadı';
+      setPaymentError(message);
+    } finally {
+      setProcessingPlan(null);
+    }
+  };
+
+  const startBankTransferPayment = async (planType: 'starter' | 'pro') => {
+    try {
+      setPaymentError('');
+      setProcessingPlan(planType);
+      const response = await fetch('/api/payment/bank-transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planType }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || 'İşlem başlatılamadı');
+      setBankModal({
+        referenceCode: data.referenceCode,
+        planName: data.planName,
+        amountWithVat: data.amountWithVat,
+        iban: data.bankDetails.iban,
+        bankName: data.bankDetails.bankName,
+        accountName: data.bankDetails.accountName,
+        description: data.bankDetails.description,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'İşlem başlatılamadı';
+      setPaymentError(message);
+    } finally {
+      setProcessingPlan(null);
+    }
+  };
+
+  const handlePlanPayment = (planType: 'starter' | 'pro') => {
+    if (paymentMethod === 'bank_transfer') {
+      startBankTransferPayment(planType);
+    } else if (paymentMethod === 'stripe') {
+      startStripePayment(planType);
+    } else {
+      startIyzicoPayment(planType);
     }
   };
 
@@ -400,6 +476,43 @@ export default function SettingsPage() {
               <Card>
                 <CardHeader title="Faturalama" subtitle="Plan ve ödeme yönetimi" icon={<CreditCard className="w-4 h-4" />} />
                 <div className="space-y-4 mt-2">
+
+                  {/* Ödeme Yöntemi Seçimi */}
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800 mb-2">Ödeme Yöntemi</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'bank_transfer', label: 'EFT / Havale', desc: 'Garanti, Ziraat, İş Bankası...', icon: '🏦' },
+                        { id: 'iyzico', label: 'Iyzico', desc: 'Türk Bankası Kartı & 3D Secure', icon: '🇹🇷' },
+                        { id: 'stripe', label: 'Stripe', desc: 'Uluslararası Kart', icon: '💳' },
+                      ].map((m) => (
+                        <button
+                          key={m.id}
+                          onClick={() => setPaymentMethod(m.id as 'bank_transfer' | 'stripe' | 'iyzico')}
+                          className={clsx(
+                            'flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all',
+                            paymentMethod === m.id
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-slate-200 hover:border-slate-300'
+                          )}
+                        >
+                          <span className="text-2xl">{m.icon}</span>
+                          <div>
+                            <p className={clsx('font-semibold text-sm', paymentMethod === m.id ? 'text-blue-700' : 'text-slate-800')}>{m.label}</p>
+                            <p className="text-xs text-slate-500">{m.desc}</p>
+                          </div>
+                          {paymentMethod === m.id && <Check className="w-4 h-4 text-blue-600 ml-auto flex-shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                    {paymentMethod === 'bank_transfer' && (
+                      <div className="mt-2 p-3 bg-green-50 rounded-xl border border-green-100 flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-green-700">Plan seçtikten sonra IBAN ve açıklama kodu gösterilir. Ödeme yapınca admin onaylar, planınız aktif olur.</p>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Plan */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
@@ -429,10 +542,12 @@ export default function SettingsPage() {
                             variant="secondary"
                             size="sm"
                             className="mt-2 w-full"
-                            onClick={() => startIyzicoPayment(plan.name === 'Pro' ? 'pro' : 'starter')}
+                            onClick={() => handlePlanPayment(plan.name === 'Pro' ? 'pro' : 'starter')}
                             disabled={processingPlan !== null}
                           >
-                            {processingPlan === (plan.name === 'Pro' ? 'pro' : 'starter') ? 'Yönlendiriliyor...' : 'Seç'}
+                            {processingPlan === (plan.name === 'Pro' ? 'pro' : 'starter')
+                              ? (paymentMethod === 'bank_transfer' ? 'Oluşturuluyor...' : 'Yönlendiriliyor...')
+                              : 'Seç'}
                           </Button>
                         )}
                       </div>
@@ -448,12 +563,54 @@ export default function SettingsPage() {
                   {/* Fatura */}
                   <div className="mt-4">
                     <p className="text-sm font-semibold text-slate-800 mb-3">Son Faturalar</p>
-                    <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
-                      <p className="text-xs text-amber-700">Iyzico ödeme altyapısı aktif. Plan değişikliklerinden sonra ödeme ekranı Iyzico Checkout ile açılır.</p>
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <p className="text-xs text-slate-500">Ödeme geçmişiniz burada görünecek.</p>
                     </div>
                   </div>
                 </div>
               </Card>
+            )}
+
+            {/* EFT / Havale Modal */}
+            {bankModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setBankModal(null)}>
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-base font-bold text-slate-900">Banka Havalesi Bilgileri</h2>
+                    <button onClick={() => setBankModal(null)} className="text-slate-400 hover:text-slate-600 text-xl leading-none">×</button>
+                  </div>
+
+                  <div className="p-3.5 bg-green-50 rounded-xl border border-green-100 mb-4">
+                    <p className="text-xs text-green-700 font-medium">Plan: {bankModal.planName}</p>
+                    <p className="text-xl font-bold text-green-700 mt-1">₺{bankModal.amountWithVat.toFixed(2)} <span className="text-xs font-normal text-green-600">(KDV dahil)</span></p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {[
+                      { label: 'Banka', value: bankModal.bankName },
+                      { label: 'Hesap Sahibi', value: bankModal.accountName },
+                      { label: 'IBAN', value: bankModal.iban },
+                      { label: 'Açıklama (Zorunlu)', value: bankModal.description },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                        <span className="text-xs text-slate-500 w-28 flex-shrink-0">{label}</span>
+                        <span className="text-sm font-semibold text-slate-800 text-right break-all">{value}</span>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(value)}
+                          className="ml-2 text-blue-500 hover:text-blue-700 text-xs flex-shrink-0"
+                          title="Kopyala"
+                        >Kopyala</button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-100">
+                    <p className="text-xs text-amber-700">Havaleyi yaptıktan sonra açıklama kodunu mutlaka yazın. Ödemeniz onaylandıktan sonra planınız otomatik aktif olur (genellikle 1-2 saat içinde).</p>
+                  </div>
+
+                  <Button className="w-full mt-4" onClick={() => setBankModal(null)}>Tamam, Anladım</Button>
+                </div>
+              </div>
             )}
 
             {/* Güvenlik */}
