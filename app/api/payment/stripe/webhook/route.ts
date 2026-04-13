@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { prisma } from '@/lib/prisma';
+import { finalizePayment } from '@/lib/payments/finalizePayment';
 
 export async function POST(request: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
@@ -28,45 +28,7 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-
-        // Payment'ı güncelle
-        await prisma.payment.updateMany({
-          where: { stripeSessionId: session.id },
-          data: {
-            status: 'completed',
-            completedAt: new Date(),
-          },
-        });
-
-        // User'ın subscription'ını güncelle
-        const payment = await prisma.payment.findFirst({
-          where: { stripeSessionId: session.id },
-        });
-
-        if (payment) {
-          const activeUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 gün
-
-          await prisma.subscription.upsert({
-            where: { userId: payment.userId },
-            update: {
-              planType: payment.planType ?? 'starter',
-              status: 'active',
-              startDate: new Date(),
-              endDate: activeUntil,
-              nextBillingDate: activeUntil,
-              autoRenew: true,
-            },
-            create: {
-              userId: payment.userId,
-              planType: payment.planType ?? 'starter',
-              status: 'active',
-              startDate: new Date(),
-              endDate: activeUntil,
-              nextBillingDate: activeUntil,
-              autoRenew: true,
-            },
-          });
-        }
+        await finalizePayment({ stripeSessionId: session.id });
 
         break;
       }

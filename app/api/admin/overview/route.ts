@@ -6,9 +6,10 @@ import { authOptions } from '@/lib/auth';
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id as string | undefined;
+    const email = session?.user?.email?.toLowerCase();
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
 
-    if (!userId) {
+    if (!email || !adminEmail || email !== adminEmail) {
       return NextResponse.json({ success: false, error: 'Yetkisiz erişim' }, { status: 401 });
     }
 

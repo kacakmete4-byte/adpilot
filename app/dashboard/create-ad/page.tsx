@@ -141,7 +141,7 @@ export default function CreateAdPage() {
         subtitle="Birkaç adımda AI destekli reklam kampanyanızı oluşturun"
       />
 
-      <div className="px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Adım Göstergesi */}
         <div className="flex items-center mb-8">
           {STEPS.map((s, i) => {

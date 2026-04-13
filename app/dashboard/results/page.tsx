@@ -79,7 +79,7 @@ export default function ResultsPage() {
         }
       />
 
-      <div className="px-8 py-8 space-y-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
 
         {/* Form Özeti */}
         <Card className="animate-fade-in-up">

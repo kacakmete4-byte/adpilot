@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
+import { failPayment, finalizePayment } from '@/lib/payments/finalizePayment';
 
 function hmacBase64(input: string, key: string) {
   return crypto.createHmac('sha256', key).update(input).digest('base64');
@@ -29,40 +29,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (status === 'success') {
-      await prisma.payment.updateMany({
-        where: { paymentId: merchantOid },
-        data: { status: 'completed', completedAt: new Date() },
-      });
-
-      const payment = await prisma.payment.findFirst({ where: { paymentId: merchantOid } });
-      if (payment) {
-        const activeUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        await prisma.subscription.upsert({
-          where: { userId: payment.userId },
-          update: {
-            planType: payment.planType ?? 'starter',
-            status: 'active',
-            startDate: new Date(),
-            endDate: activeUntil,
-            nextBillingDate: activeUntil,
-            autoRenew: true,
-          },
-          create: {
-            userId: payment.userId,
-            planType: payment.planType ?? 'starter',
-            status: 'active',
-            startDate: new Date(),
-            endDate: activeUntil,
-            nextBillingDate: activeUntil,
-            autoRenew: true,
-          },
-        });
-      }
+      await finalizePayment({ paymentId: merchantOid });
     } else {
-      await prisma.payment.updateMany({
-        where: { paymentId: merchantOid },
-        data: { status: 'failed' },
-      });
+      await failPayment({ paymentId: merchantOid });
     }
 
     return new NextResponse('OK');

@@ -125,7 +125,7 @@ export default function ReportsPage() {
         }
       />
 
-      <div className="px-8 py-8 space-y-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-500 flex items-center gap-1.5">

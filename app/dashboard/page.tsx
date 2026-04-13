@@ -134,11 +134,11 @@ export default function DashboardPage() {
         }
       />
 
-      <div className="px-8 py-8 space-y-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
         {/* AI Öneri Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>

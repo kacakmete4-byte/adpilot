@@ -63,7 +63,7 @@ export default function SupportPage() {
     <div>
       <Header title="Iletisim" subtitle="Sikayet ve onerilerinizi buraya yazin" />
 
-      <div className="px-8 py-8 max-w-3xl">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-3xl">
         <Card>
           <CardHeader
             title="Sikayet ve Oneri Formu"

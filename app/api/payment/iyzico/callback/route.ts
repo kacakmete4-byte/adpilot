@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { failPayment, finalizePayment } from '@/lib/payments/finalizePayment';
 
 const Iyzipay = require('iyzipay');
 
@@ -52,50 +52,14 @@ export async function POST(request: NextRequest) {
     const retrievedConversationId = retrieved?.conversationId || conversationId || null;
 
     if (paymentStatus === 'SUCCESS' && retrievedConversationId) {
-      await prisma.payment.updateMany({
-        where: { paymentId: retrievedConversationId },
-        data: {
-          status: 'completed',
-          completedAt: new Date(),
-        },
-      });
-
-      const payment = await prisma.payment.findFirst({ where: { paymentId: retrievedConversationId } });
-
-      if (payment) {
-        const activeUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-
-        await prisma.subscription.upsert({
-          where: { userId: payment.userId },
-          update: {
-            planType: payment.planType ?? 'starter',
-            status: 'active',
-            startDate: new Date(),
-            endDate: activeUntil,
-            nextBillingDate: activeUntil,
-            autoRenew: true,
-          },
-          create: {
-            userId: payment.userId,
-            planType: payment.planType ?? 'starter',
-            status: 'active',
-            startDate: new Date(),
-            endDate: activeUntil,
-            nextBillingDate: activeUntil,
-            autoRenew: true,
-          },
-        });
-      }
+      await finalizePayment({ paymentId: retrievedConversationId });
 
       const successUrl = `${process.env.NEXTAUTH_URL || 'https://advara.vercel.app'}/dashboard?success=true`;
       return NextResponse.redirect(successUrl);
     }
 
     if (retrievedConversationId) {
-      await prisma.payment.updateMany({
-        where: { paymentId: retrievedConversationId },
-        data: { status: 'failed' },
-      });
+      await failPayment({ paymentId: retrievedConversationId });
     }
 
     const failedUrl = `${process.env.NEXTAUTH_URL || 'https://advara.vercel.app'}/dashboard/subscription?canceled=true`;

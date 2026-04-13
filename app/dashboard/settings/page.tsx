@@ -291,18 +291,18 @@ export default function SettingsPage() {
         subtitle="Hesap ve uygulama ayarlarınızı yönetin"
       />
 
-      <div className="px-8 py-8">
-        <div className="flex gap-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-6">
 
           {/* Yan Menü */}
-          <aside className="w-52 flex-shrink-0">
-            <nav className="space-y-1">
+          <aside className="w-full lg:w-52 flex-shrink-0">
+            <nav className="flex lg:block gap-2 lg:space-y-1 overflow-x-auto pb-1 lg:pb-0">
               {TABS.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
                   className={clsx(
-                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left',
+                    'flex lg:w-full items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left whitespace-nowrap',
                     activeTab === id
                       ? 'bg-blue-600 text-white'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
