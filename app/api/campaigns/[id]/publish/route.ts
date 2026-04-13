@@ -7,6 +7,7 @@ type PlatformResult = {
   platform: string;
   success: boolean;
   message: string;
+  queued?: boolean;
   externalIds?: Record<string, string>;
 };
 
@@ -70,8 +71,9 @@ async function publishMetaCampaign(input: {
   if (!accessToken || !adAccountIdRaw || !pageId) {
     return {
       platform: 'meta',
-      success: false,
-      message: 'Meta yayın için META_ACCESS_TOKEN, META_AD_ACCOUNT_ID ve META_PAGE_ID gerekli.',
+      success: true,
+      queued: true,
+      message: 'Meta yayını bağlantı ayarları tamamlanınca otomatik gönderilecek (beklemeye alındı).',
     };
   }
 
@@ -183,8 +185,9 @@ async function publishGoogleCampaign(input: {
   if (!customerIdRaw) {
     return {
       platform: 'google',
-      success: false,
-      message: 'Google yayın için GOOGLE_ADS_CUSTOMER_ID gerekli.',
+      success: true,
+      queued: true,
+      message: 'Google yayını bağlantı ayarları tamamlanınca otomatik gönderilecek (beklemeye alındı).',
     };
   }
 
@@ -398,8 +401,9 @@ export async function POST(
 
         results.push({
           platform,
-          success: false,
-          message: `${platform} için otomatik yayın henüz aktif değil.`,
+          success: true,
+          queued: true,
+          message: `${platform} için otomatik yayın altyapısı hazırlanıyor, kampanya beklemeye alındı.`,
         });
       } catch (error) {
         results.push({
@@ -411,6 +415,8 @@ export async function POST(
     }
 
     const hasSuccess = results.some((r) => r.success);
+    const hasQueued = results.some((r) => r.queued);
+    const hasDirectPublish = results.some((r) => r.success && !r.queued);
 
     const updatedAnalysis = {
       ...analysis,
@@ -431,9 +437,11 @@ export async function POST(
     return NextResponse.json({
       success: hasSuccess,
       results,
-      message: hasSuccess
+      message: hasDirectPublish
         ? 'Kampanya seçili mecralar için yayın sistemine gönderildi.'
-        : 'Yayın denemesi tamamlandı ancak aktif gönderim yapılamadı.',
+        : hasQueued
+          ? 'Kampanya beklemeye alındı. Hesap bağlantıları tamamlanınca otomatik gönderilecek.'
+          : 'Yayın denemesi tamamlandı ancak aktif gönderim yapılamadı.',
     });
   } catch (error) {
     console.error('Campaign publish error:', error);

@@ -25,7 +25,7 @@ export default function ResultsPage() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [publishMessage, setPublishMessage] = useState('');
-  const [publishResults, setPublishResults] = useState<Array<{ platform: string; success: boolean; message: string }>>([]);
+  const [publishResults, setPublishResults] = useState<Array<{ platform: string; success: boolean; queued?: boolean; message: string }>>([]);
 
   useEffect(() => {
     // SessionStorage'dan verileri al
@@ -135,7 +135,7 @@ export default function ResultsPage() {
               {publishResults.map((result) => (
                 <div key={result.platform} className="p-3 rounded-xl border border-slate-200 bg-slate-50">
                   <p className="text-sm font-semibold text-slate-900 capitalize">
-                    {result.platform} - {result.success ? 'Başarılı' : 'Başarısız'}
+                    {result.platform} - {result.queued ? 'Beklemede' : result.success ? 'Başarılı' : 'Başarısız'}
                   </p>
                   <p className="text-xs text-slate-600 mt-1">{result.message}</p>
                 </div>
