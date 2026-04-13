@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Zap, ArrowRight, Building2 } from 'lucide-react';
+import { Zap, ArrowRight, Building2, Clock3, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -62,6 +62,13 @@ export default function RegisterPage() {
             <p className="text-slate-500 mt-1 text-sm">Kendi reklamını kendin yönet, bütçeni daha akıllı kullan</p>
           </div>
 
+          <div className="mb-5 p-3 rounded-xl border border-emerald-200 bg-emerald-50 flex items-start gap-2.5">
+            <Clock3 className="w-4 h-4 text-emerald-700 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-emerald-800 leading-relaxed">
+              Kurulum kısa sürer. Kayıttan sonra hedefini girip dakikalar içinde ilk kampanya planını çıkarabilirsin.
+            </p>
+          </div>
+
           <form onSubmit={handleRegister} className="space-y-4">
             <Input
               label="Ad Soyad"
@@ -117,6 +124,20 @@ export default function RegisterPage() {
             </Button>
           </form>
 
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {[
+              { icon: ShieldCheck, title: 'Güven', text: 'Karar süreci şeffaf ve anlaşılır' },
+              { icon: Sparkles, title: 'Hız', text: 'Karmaşık panel yok, net adımlar var' },
+              { icon: Clock3, title: 'Tasarruf', text: 'Deneme-yanılmayı azaltır' },
+            ].map((item) => (
+              <div key={item.title} className="p-2.5 rounded-xl border border-slate-200 bg-slate-50">
+                <item.icon className="w-4 h-4 text-blue-600" />
+                <p className="text-xs font-semibold text-slate-800 mt-2">{item.title}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{item.text}</p>
+              </div>
+            ))}
+          </div>
+
           {/* Plan kartları */}
           <div className="mt-6 grid grid-cols-3 gap-2">
             {[
@@ -165,6 +186,10 @@ export default function RegisterPage() {
             <Link href="/login" className="text-blue-600 font-medium hover:text-blue-700">
               Giriş Yap
             </Link>
+          </p>
+
+          <p className="mt-3 text-center text-xs text-slate-400">
+            Reklam bütçeni başkasına teslim etmeden, kendi stratejini kendin yönet.
           </p>
         </div>
       </div>

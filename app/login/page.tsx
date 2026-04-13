@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Zap, Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-react';
+import { Zap, Eye, EyeOff, ArrowRight, CheckCircle, ShieldCheck, BarChart3, Target } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -120,6 +120,32 @@ export default function LoginPage() {
               </p>
             </div>
 
+            <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {[
+                {
+                  icon: ShieldCheck,
+                  title: 'Şeffaf',
+                  desc: 'Bütçe dağılımı nedenleri açık',
+                },
+                {
+                  icon: BarChart3,
+                  title: 'Ölçülebilir',
+                  desc: 'Kararlarını veriye dayandır',
+                },
+                {
+                  icon: Target,
+                  title: 'Kontrol Sende',
+                  desc: 'Reklamı tek panelden yönet',
+                },
+              ].map((item) => (
+                <div key={item.title} className="p-2.5 rounded-xl border border-slate-200 bg-slate-50">
+                  <item.icon className="w-4 h-4 text-blue-600" />
+                  <p className="text-xs font-semibold text-slate-800 mt-2">{item.title}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
             <form onSubmit={handleLogin} className="space-y-4">
               <Input
                 label="E-posta Adresi"
@@ -174,6 +200,10 @@ export default function LoginPage() {
               <Link href="/register" className="text-blue-600 font-medium hover:text-blue-700">
                 Ücretsiz Kayıt Ol
               </Link>
+            </p>
+
+            <p className="mt-3 text-center text-xs text-slate-400">
+              Ajans bağımlılığını azalt, reklam kararlarını işletmenin içinde tut.
             </p>
           </div>
         </div>
