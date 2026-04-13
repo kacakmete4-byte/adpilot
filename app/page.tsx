@@ -30,12 +30,12 @@ export default function HomePage() {
               Kendi reklamını kendin yönet
             </p>
             <h1 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">
-              Ajansa bağımlı kalmadan,
-              <span className="block text-blue-300"> reklam bütçeni daha akıllı yönet.</span>
+              Senin yerine reklamlarını otomatik optimize et,
+              <span className="block text-blue-300"> daha fazla doğru müşteriye ulaş.</span>
             </h1>
             <p className="mt-5 text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
-              Advara, işletmenin hedefini ve bütçesini analiz eder; hangi mecraya neden bütçe ayırman gerektiğini
-              anlaşılır şekilde açıklar. Böylece tahminle değil, gerekçeli bir planla reklam verirsin.
+              Advara, işletmenin hedefini ve bütçesini analiz eder; kampanyanı otomatik optimize eder ve hangi mecraya
+              neden bütçe ayırdığını şeffaf biçimde açıklar. Böylece tahmin yerine sistemli büyüme planı uygularsın.
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">

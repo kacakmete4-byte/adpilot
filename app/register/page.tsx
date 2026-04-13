@@ -59,7 +59,7 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900">Hesap Oluştur</h2>
-            <p className="text-slate-500 mt-1 text-sm">Kendi reklamını kendin yönet, bütçeni daha akıllı kullan</p>
+            <p className="text-slate-500 mt-1 text-sm">Reklamlarını otomatik optimize et, daha çok müşteriye ulaş</p>
           </div>
 
           <div className="mb-5 p-3 rounded-xl border border-emerald-200 bg-emerald-50 flex items-start gap-2.5">

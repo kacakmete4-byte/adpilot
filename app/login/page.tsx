@@ -52,12 +52,12 @@ export default function LoginPage() {
 
         <div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-            Reklam ajansına mecbur kalmadan<br />
-            <span className="text-blue-400">işini kendi panelinden büyüt.</span>
+            Senin yerine reklamlarını otomatik optimize et<br />
+            <span className="text-blue-400">ve daha fazla müşteriye ulaş.</span>
           </h1>
           <p className="text-slate-400 text-lg leading-relaxed mb-10">
-            Advara, işletme bilgilerini analiz edip bütçeni nereye neden ayırman gerektiğini açıklar.
-            Böylece kör bütçe harcamaz, kararlarını veriyle verirsin.
+            Advara, işletme bilgilerini analiz eder; reklam ayarlarını otomatik iyileştirir ve bütçe dağılımını
+            anlaşılır şekilde açıklar. Böylece daha verimli müşteri kazanım akışı kurarsın.
           </p>
 
           <div className="space-y-4">

@@ -23,6 +23,9 @@ export default function ResultsPage() {
     ad_examples?: string[];
   } | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [publishMessage, setPublishMessage] = useState('');
+  const [publishResults, setPublishResults] = useState<Array<{ platform: string; success: boolean; message: string }>>([]);
 
   useEffect(() => {
     // SessionStorage'dan verileri al
@@ -46,6 +49,37 @@ export default function ResultsPage() {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const publishCampaign = async () => {
+    const campaignId = sessionStorage.getItem('campaignId');
+    if (!campaignId) {
+      setPublishMessage('Önce kampanya oluşturulmalı.');
+      return;
+    }
+
+    try {
+      setPublishing(true);
+      setPublishMessage('');
+      setPublishResults([]);
+
+      const response = await fetch(`/api/campaigns/${campaignId}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Yayın başlatılamadı');
+      }
+
+      setPublishMessage(data?.message || 'Yayın işlemi tamamlandı.');
+      setPublishResults(Array.isArray(data?.results) ? data.results : []);
+    } catch (error) {
+      setPublishMessage(error instanceof Error ? error.message : 'Yayın işlemi başarısız.');
+    } finally {
+      setPublishing(false);
+    }
   };
 
   if (!formData || !webhookResponse) {
@@ -72,15 +106,43 @@ export default function ResultsPage() {
         title="Reklam Analizi Sonucu"
         subtitle={`${formData.businessName} için kampanya analizi`}
         action={
-          <Link href="/dashboard/create-ad">
-            <Button size="sm" icon={<PlusCircle className="w-4 h-4" />}>
-              Yeni Analiz
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={publishCampaign} loading={publishing}>
+              {publishing ? 'Yayınlanıyor...' : 'Mecra Hesaplarına Gönder'}
             </Button>
-          </Link>
+            <Link href="/dashboard/create-ad">
+              <Button size="sm" icon={<PlusCircle className="w-4 h-4" />} variant="secondary">
+                Yeni Analiz
+              </Button>
+            </Link>
+          </div>
         }
       />
 
       <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+
+        {(publishMessage || publishResults.length > 0) && (
+          <Card className="animate-fade-in-up">
+            <CardHeader
+              title="Yayın Durumu"
+              subtitle="Kampanyanın mecralara gönderim sonucu"
+              icon={<Download className="w-4 h-4" />}
+            />
+            <div className="p-4 space-y-3">
+              {publishMessage && (
+                <p className="text-sm text-slate-700">{publishMessage}</p>
+              )}
+              {publishResults.map((result) => (
+                <div key={result.platform} className="p-3 rounded-xl border border-slate-200 bg-slate-50">
+                  <p className="text-sm font-semibold text-slate-900 capitalize">
+                    {result.platform} - {result.success ? 'Başarılı' : 'Başarısız'}
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">{result.message}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {/* Form Özeti */}
         <Card className="animate-fade-in-up">
