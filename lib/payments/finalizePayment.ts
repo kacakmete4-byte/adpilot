@@ -57,6 +57,10 @@ export async function finalizePayment(lookup: PaymentLookup) {
   const payment = await prisma.payment.findFirst({ where });
   if (!payment) return null;
 
+  if (payment.status === 'completed') {
+    return payment;
+  }
+
   const invoiceNo = payment.invoiceNo || generateInvoiceNo(payment.id);
   const issuedDate = payment.issuedDate || new Date();
 
@@ -80,6 +84,10 @@ export async function failPayment(lookup: PaymentLookup) {
 
   const payment = await prisma.payment.findFirst({ where });
   if (!payment) return null;
+
+  if (payment.status === 'completed' || payment.status === 'failed') {
+    return payment;
+  }
 
   return prisma.payment.update({
     where: { id: payment.id },

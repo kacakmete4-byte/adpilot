@@ -27,7 +27,7 @@ export default function ResultsPage() {
   useEffect(() => {
     // SessionStorage'dan verileri al
     const savedForm = sessionStorage.getItem('adFormData');
-    const savedWebhook = sessionStorage.getItem('n8nWebhookResponse');
+    const savedWebhook = sessionStorage.getItem('adSuggestionResponse');
 
     if (savedForm) {
       setFormData(JSON.parse(savedForm));
@@ -69,8 +69,8 @@ export default function ResultsPage() {
   return (
     <div>
       <Header
-        title="AI Reklam Analizi Sonucu"
-        subtitle={`${formData.businessName} için OpenAI analizi`}
+        title="Reklam Analizi Sonucu"
+        subtitle={`${formData.businessName} için kampanya analizi`}
         action={
           <Link href="/dashboard/create-ad">
             <Button size="sm" icon={<PlusCircle className="w-4 h-4" />}>
@@ -86,7 +86,7 @@ export default function ResultsPage() {
         <Card className="animate-fade-in-up">
           <CardHeader
             title="Gönderilen Form Verileri"
-            subtitle="n8n webhook'una gönderilen bilgiler"
+            subtitle="Analiz için gönderilen işletme ve kampanya bilgileri"
             icon={<Target className="w-4 h-4" />}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
@@ -131,11 +131,11 @@ export default function ResultsPage() {
           </div>
         </Card>
 
-        {/* OpenAI Analizi Sonucu */}
+        {/* Analiz Sonucu */}
         <Card className="animate-fade-in-up">
           <CardHeader
-            title="OpenAI Analizi Sonucu"
-            subtitle="AI'dan gelen reklam önerisi ve bütçe dağılımı"
+            title="Kampanya Analizi Sonucu"
+            subtitle="Önerilen reklam stratejisi ve bütçe dağılımı"
             icon={<MessageSquare className="w-4 h-4" />}
           />
           <div className="space-y-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">

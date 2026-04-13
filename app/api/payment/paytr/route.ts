@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const callbackUrl = `${baseUrl}/api/payment/paytr/callback`;
     const successUrl = `${baseUrl}/dashboard?success=true`;
-    const failUrl = `${baseUrl}/dashboard/subscription?canceled=true`;
+    const failUrl = `${baseUrl}/dashboard/settings?tab=billing&canceled=true`;
 
     const formPayload = new URLSearchParams({
       merchant_id: merchantId,

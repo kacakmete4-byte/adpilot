@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       await failPayment({ paymentId: retrievedConversationId });
     }
 
-    const failedUrl = `${process.env.NEXTAUTH_URL || 'https://advara.vercel.app'}/dashboard/subscription?canceled=true`;
+    const failedUrl = `${process.env.NEXTAUTH_URL || 'https://advara.vercel.app'}/dashboard/settings?tab=billing&canceled=true`;
     return NextResponse.redirect(failedUrl);
   } catch (error) {
     console.error('Iyzico callback error:', error);

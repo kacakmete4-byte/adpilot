@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   User, Bell, CreditCard, Shield, Link2, Check,
-  Building2, Mail, Phone, Globe, Lock, ChevronRight,
+  Building2, Mail, Phone, Lock, ChevronRight,
   Zap, AlertCircle
 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
@@ -45,7 +45,6 @@ export default function SettingsPage() {
     email: '',
     company: '',
     phone: '',
-    website: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -259,28 +258,28 @@ export default function SettingsPage() {
       badge: 'Bağlantı Bekliyor',
     },
     {
-      id: 'openai',
-      name: 'OpenAI',
-      desc: 'AI reklam önerileri için GPT-4 entegrasyonu',
-      icon: '🤖',
-      status: 'mock',
-      badge: 'Mock Mod',
+      id: 'instagram',
+      name: 'Instagram Ads',
+      desc: 'Instagram gönderi, reels ve hikaye reklamları',
+      icon: '📸',
+      status: 'pending',
+      badge: 'Bağlantı Bekliyor',
     },
     {
-      id: 'n8n',
-      name: 'n8n Otomasyon',
-      desc: 'İş akışı otomasyonu ve API entegrasyonu',
-      icon: '⚡',
-      status: 'mock',
-      badge: 'Mock Mod',
+      id: 'tiktok',
+      name: 'TikTok Ads',
+      desc: 'Kısa video odaklı reklam kampanyaları',
+      icon: '🎵',
+      status: 'coming',
+      badge: 'Yakında',
     },
     {
-      id: 'iyzico',
-      name: 'Iyzico',
-      desc: 'Ödeme işlemleri ve fatura yönetimi',
-      icon: '💳',
-      status: 'connected',
-      badge: 'Aktif',
+      id: 'youtube',
+      name: 'YouTube Ads',
+      desc: 'Video reklamlarla marka görünürlüğünü artırın',
+      icon: '▶️',
+      status: 'coming',
+      badge: 'Yakında',
     },
   ];
 
@@ -350,13 +349,6 @@ export default function SettingsPage() {
                       onChange={(e) => setProfile(p => ({ ...p, phone: e.target.value }))}
                       prefix={<Phone className="w-4 h-4" />}
                     />
-                    <Input
-                      label="Web Sitesi"
-                      type="url"
-                      value={profile.website}
-                      onChange={(e) => setProfile(p => ({ ...p, website: e.target.value }))}
-                      prefix={<Globe className="w-4 h-4" />}
-                    />
                   </div>
                 </Card>
 
@@ -408,7 +400,7 @@ export default function SettingsPage() {
                   <div>
                     <p className="text-sm font-medium text-amber-800">Demo Mod Aktif</p>
                     <p className="text-xs text-amber-700 mt-0.5">
-                      Şu an mock veriyle çalışıyorsunuz. Gerçek entegrasyonlar yakında eklenecek. n8n webhook bağlantısı için .env.local dosyasını güncelleyin.
+                      Şu an test modundasınız. Reklam mecrası bağlantılarınız hazır olduğunda kampanyaları bu panelden doğrudan yönetebilirsiniz.
                     </p>
                   </div>
                 </div>

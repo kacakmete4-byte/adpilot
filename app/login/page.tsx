@@ -52,25 +52,44 @@ export default function LoginPage() {
 
         <div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-            İşletmenizi büyütmek<br />
-            <span className="text-blue-400">hiç bu kadar kolay olmamıştı.</span>
+            Reklam ajansına mecbur kalmadan<br />
+            <span className="text-blue-400">işini kendi panelinden büyüt.</span>
           </h1>
           <p className="text-slate-400 text-lg leading-relaxed mb-10">
-            Yapay zeka destekli reklam yönetim panelinizle Meta, Google ve Instagram'da profesyonel kampanyalar oluşturun.
+            Advara, işletme bilgilerini analiz edip bütçeni nereye neden ayırman gerektiğini açıklar.
+            Böylece kör bütçe harcamaz, kararlarını veriyle verirsin.
           </p>
 
           <div className="space-y-4">
             {[
-              'Saniyeler içinde AI destekli reklam önerisi',
-              'Otomatik bütçe optimizasyonu',
-              'Gerçek zamanlı kampanya analizi',
-              'Tüm platformları tek panelden yönetin',
+              'Saniyeler içinde AI destekli reklam planı al',
+              'Bütçenin neden bölündüğünü platform bazlı net gör',
+              'Ajans jargonu olmadan net aksiyon listesi al',
+              'Meta, Google ve diğer kanalları tek panelden yönet',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
                 <span className="text-slate-300 text-sm">{item}</span>
               </div>
             ))}
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 gap-4">
+            <div className="rounded-2xl border border-blue-900/70 bg-slate-900/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-blue-300">Hakkımızda</p>
+              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+                Advara, reklam uzmanı olmayan işletme sahiplerinin bile profesyonel kampanya kararı verebilmesi için
+                geliştirildi. Amaç: reklam yönetimini ajans bağımlılığından çıkarıp işletmenin kendi kontrolüne almak.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-blue-900/70 bg-slate-900/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-blue-300">Ne İşe Yarar?</p>
+              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+                İşletme tipini, hedefini ve bütçeni analiz eder; "Google %70 / Meta %30" gibi dağılımları gerekçesiyle
+                açıklar. Nerede müşteri niyeti yüksek, nerede marka görünürlüğü gerekir net anlatır. Sonuç: daha az
+                tahmin, daha çok kontrol, daha verimli reklam harcaması.
+              </p>
+            </div>
           </div>
         </div>
 

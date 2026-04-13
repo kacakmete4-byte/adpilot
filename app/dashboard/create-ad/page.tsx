@@ -91,9 +91,9 @@ export default function CreateAdPage() {
     setLoading(true);
     
     try {
-      console.log('Form submit başladı, OpenAI analizi başlatılıyor...', form);
+      console.log('Form submit başladı, analiz başlatılıyor...', form);
       
-      // OpenAI ile analiz yap
+      // Analiz motoru ile öneri üret
       const data = await getAdSuggestion(form);
       const saveResponse = await fetch('/api/campaigns', {
         method: 'POST',
@@ -106,10 +106,10 @@ export default function CreateAdPage() {
         throw new Error(saveData?.error || 'Kampanya kaydedilemedi');
       }
       
-      console.log('OpenAI analizi tamamlandı:', data);
+      console.log('Analiz tamamlandı:', data);
 
       sessionStorage.setItem('adFormData', JSON.stringify(form));
-      sessionStorage.setItem('n8nWebhookResponse', JSON.stringify(data));
+      sessionStorage.setItem('adSuggestionResponse', JSON.stringify(data));
       sessionStorage.setItem('campaignId', String(saveData?.campaignId || ''));
 
       console.log('Veriler sessionStorage\'a kaydedildi, results sayfasına yönlendiriliyor...');
@@ -120,7 +120,7 @@ export default function CreateAdPage() {
       
       if (err instanceof TypeError) {
         if (err.message.includes('fetch')) {
-          message = `OpenAI API ulaşılamıyor: ${err.message}`;
+          message = `Analiz servisine ulaşılamıyor: ${err.message}`;
         } else {
           message = err.message;
         }

@@ -59,7 +59,7 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900">Hesap Oluştur</h2>
-            <p className="text-slate-500 mt-1 text-sm">14 gün ücretsiz deneyin, kart gerekmez</p>
+            <p className="text-slate-500 mt-1 text-sm">Kendi reklamını kendin yönet, bütçeni daha akıllı kullan</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
@@ -141,6 +141,23 @@ export default function RegisterPage() {
                 <p className="text-xs text-slate-500">{plan.campaigns}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6 space-y-2.5">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Hakkımızda</p>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Advara, işletmelerin reklam kararlarını dışarıya tamamen bağımlı kalmadan alabilmesi için geliştirilen
+                AI destekli bir karar ve yönetim panelidir.
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">Ne İşe Yarar?</p>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Hedefini ve bütçeni analiz eder, hangi platforma neden bütçe ayrıldığını şeffaf biçimde açıklar,
+                uygulamayı adım adım yönlendirir. Böylece deneme-yanılma ve gereksiz reklam harcaması azalır.
+              </p>
+            </div>
           </div>
 
           <p className="mt-5 text-center text-sm text-slate-500">
