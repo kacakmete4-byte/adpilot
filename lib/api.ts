@@ -55,8 +55,13 @@ ANALİZİN İÇERMESİ GEREKENLER:
 1. **Kısa Mesaj:** İşletme için özelleştirilmiş başarı mesajı
 2. **Reklam Önerisi:** Detaylı reklam stratejisi ve önerileri
 3. **Bütçe Dağılımı:** Seçilen platformlara göre günlük bütçe dağılımı (toplam ${formData.dailyBudget}₺)
-4. **Hedef Kitle Önerisi:** Bu işletme için uygun hedef kitle
-5. **Reklam Metin Örnekleri:** 2-3 farklı reklam metni örneği
+4. **Bütçe Açıklamaları:** Her platforma ayrılan bütçe için DETAYLI açıklama - neden o yüzde verildi, o platformun avantajları, müşteri potansiyeli vb.
+5. **Hedef Kitle Önerisi:** Bu işletme için uygun hedef kitle
+6. **Reklam Metin Örnekleri:** 2-3 farklı reklam metni örneği
+
+ÖNEMLI: Bütçe açıklamalarında DETAYLI olun. Örnek:
+- Google (700₺, %70): "Bu sektörde Google Search en yüksek müşteri dönüş oranına sahiptir çünkü arama yapan kişiler satın almaya hazırdır. Yüksek intent, düşük müşteri kazanım maliyeti. Örn: İmalatçı için 'üretim hizmeti' arayan müşteriler çok değerlidir."
+- Meta (300₺, %30): "İkinci seviye olarak Meta (Facebook/Instagram) brand awareness ve uzun vadeli müşteri bilgisi için kullanılır. Daha geniş erişim ama daha düşük anlık dönüş. Retargeting için de çok etkili."
 
 YANIT FORMATI (JSON):
 {
@@ -66,6 +71,11 @@ YANIT FORMATI (JSON):
     "meta": sayı,
     "google": sayı,
     "tiktok": sayı
+  },
+  "budget_explanations": {
+    "meta": "Detaylı açıklama neden bu para verildi ve avantajları",
+    "google": "Detaylı açıklama neden bu para verildi ve avantajları",
+    "tiktok": "Detaylı açıklama neden bu para verildi ve avantajları"
   },
   "target_audience": "Hedef kitle açıklaması",
   "ad_examples": ["Örnek 1", "Örnek 2", "Örnek 3"]
@@ -100,6 +110,7 @@ YANIT FORMATI (JSON):
       message: data.message || 'Analiz tamamlandı',
       recommendation: data.recommendation || 'Reklam önerisi hazır',
       budget_split: data.budget_split || { meta: formData.dailyBudget },
+      budget_explanations: data.budget_explanations || {},
       target_audience: data.target_audience || 'Hedef kitle belirlenemedi',
       ad_examples: data.ad_examples || []
     };

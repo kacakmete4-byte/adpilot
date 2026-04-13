@@ -18,6 +18,7 @@ export default function ResultsPage() {
     message?: string; 
     recommendation?: string; 
     budget_split?: Record<string, number>;
+    budget_explanations?: Record<string, string>;
     target_audience?: string;
     ad_examples?: string[];
   } | null>(null);
@@ -156,16 +157,50 @@ export default function ResultsPage() {
                 <p className="text-base font-semibold text-slate-900">{webhookResponse.target_audience}</p>
               </div>
             )}
+
+            {/* Bütçe Dağılımı Öncesi Açıklama */}
+            {webhookResponse.budget_split && (
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
+                <p className="text-sm font-bold text-amber-900 mb-2">💡 Bütçe Dağılımı Hakkında</p>
+                <p className="text-sm text-amber-800 leading-relaxed">
+                  Aşağıda gösterilen bütçe dağılımı, yapay zeka tarafından {formData?.businessName}'nin sektörü, hedefi ve seçilen platformlar dikkate alınarak hesaplanmıştır. Her platform için <strong>detaylı açıklamalar</strong> mevcuttur. Sizin istemeniz durumunda bu dağılımı değiştirebilir veya farklı stratejiler deneyebilirsiniz.
+                </p>
+              </div>
+            )}
             {webhookResponse.budget_split && (
               <div>
-                <p className="text-sm text-slate-500">Bütçe Dağılımı</p>
-                <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {Object.entries(webhookResponse.budget_split).map(([platform, amount]) => (
-                    <div key={platform} className="p-3 rounded-xl bg-white border border-slate-200">
-                      <p className="text-sm text-slate-500 capitalize">{platform}</p>
-                      <p className="text-lg font-bold text-slate-900">₺{amount}</p>
-                    </div>
-                  ))}
+                <p className="text-sm text-slate-500 mb-4">Bütçe Dağılımı & Detaylı Açıklama</p>
+                <div className="space-y-3">
+                  {Object.entries(webhookResponse.budget_split).map(([platform, amount]) => {
+                    const explanation = webhookResponse.budget_explanations?.[platform];
+                    const totalBudget = Object.values(webhookResponse.budget_split || {}).reduce((a, b) => a + b, 0);
+                    const percentage = totalBudget > 0 ? Math.round((amount / totalBudget) * 100) : 0;
+                    
+                    return (
+                      <div key={platform} className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="text-sm font-bold text-slate-900 capitalize">{platform}</p>
+                            <p className="text-2xl font-bold text-blue-600 mt-1">₺{amount}</p>
+                            <p className="text-xs text-blue-600 font-semibold mt-1">{percentage}% Bütçeleme Oranı</p>
+                          </div>
+                          <div className="text-right text-xs text-slate-500">
+                            <p>Günlük</p>
+                            <p className="font-semibold text-slate-700">Ayrılan Bütçe</p>
+                          </div>
+                        </div>
+                        
+                        {explanation && (
+                          <div className="mt-4 pt-4 border-t border-blue-200">
+                            <p className="text-sm text-slate-750 leading-relaxed">
+                              <span className="font-bold text-slate-900">Neden {percentage}%? </span>
+                              {explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

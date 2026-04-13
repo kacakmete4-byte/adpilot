@@ -105,6 +105,11 @@ export function generateMockSuggestion(formData: AdFormData): AdSuggestion {
       google: Math.round(dailyBudget * 0.4),
       tiktok: Math.round(dailyBudget * 0.0),
     },
+    budget_explanations: {
+      meta: `Facebook/Instagram İçin %60 Ayırma Nedeni: Meta platformları ${sector === 'manufacturing' ? 'B2B işletmeler' : 'işletmeler'} için en geniş hedefleme seçeneklerine sahiptir. Detaylı demographic ve interest-based targeting sayesinde exact müşteri profili önerisiyle iletişim kurabilirsiniz. Ayrıca yüksek engagement oranları ve conversion tracking özellekleri kampanyayı optimize etmek için ideal ortam sağlar.`,
+      google: `Google Arama İçin %40 Ayırma Nedeni: Google Ads, ${sector === 'manufacturing' ? 'ürün arayan ve hemen satın almaya hazır' : 'arama yapan ve satın almaya hazır'} müşterilere ulaşmanın en etkili yoludur. Google Search Network'te göründüğünüzde, müşterilerini actively araya çıkan insanlarla karşılaşırsınız. Bu da yüksek conversion rate'i (ROI) garantiler. ${sector} sektöründe search intent çok yüksektir.`,
+      tiktok: `Alternatif Platform: TikTok, daha genç demografik ve brand awareness için uygun. Şimdilik sınırlı bütçe öneriliyorsa, %5-10 arası bir test bütçesi ile başlayabilirsiniz.`,
+    },
     target_audience: `${targetLocation} bölgesinde ${sector} sektöründe olan, ${adGoal === 'sales' ? 'satışa yönelik' : 'marka farkındalığına yönelik'} kullanıcılar.`,
     ad_examples: [
       `${businessName} ile şimdi alışveriş zamanı! Hemen web sitemizi ziyaret edin.`,

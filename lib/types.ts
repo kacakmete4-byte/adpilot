@@ -69,6 +69,7 @@ export interface AdSuggestion {
   message?: string;
   recommendation?: string;
   budget_split?: Record<string, number>;
+  budget_explanations?: Record<string, string>;
   target_audience?: string;
   ad_examples?: string[];
   notes?: string[];
